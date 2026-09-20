@@ -1,0 +1,138 @@
+body {
+    background: #0d0d0c;
+    color: #f2ede4;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .marca {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  .marca span { color: #ff6b1a; }
+
+  .card {
+    background: #161613;
+    border: 1px solid #2a2a25;
+    border-radius: 6px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .boia {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    border: 10px solid #ff6b1a;
+    background:
+      repeating-conic-gradient(#ff6b1a 0deg 30deg, #0d0d0c 30deg 60deg);
+    position: relative;
+  }
+  .boia::after {
+    content: "";
+    position: absolute;
+    top: 15px; left: 15px; right: 15px; bottom: 15px;
+    background: #161613;
+    border-radius: 50%;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 26px;
+    margin-bottom: 6px;
+  }
+
+  p.sub {
+    text-align: center;
+    color: #a49e93;
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .campo {
+    margin-bottom: 16px;
+  }
+
+  .campo label {
+    display: block;
+    font-size: 13px;
+    color: #cfcac0;
+    margin-bottom: 6px;
+  }
+
+  .campo input {
+    width: 100%;
+    background: #0d0d0c;
+    border: 1px solid #2a2a25;
+    color: #f2ede4;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 4px;
+  }
+
+  .campo input:focus {
+    outline: none;
+    border-color: #ff6b1a;
+  }
+
+  button {
+    width: 100%;
+    background: #ff6b1a;
+    color: #0d0d0c;
+    border: none;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  button:hover { background: #ff7d38; }
+
+  .rodape {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #a49e93;
+  }
+
+  .rodape a { color: #ff6b1a; text-decoration: none; }
+  
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0d0c; color: #f2ede4; font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .marca { position: absolute; top: 24px; left: 24px; font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+  .marca span { color: #ff6b1a; }
+  .card { background: #161613; border: 1px solid #2a2a25; border-radius: 6px; padding: 40px 32px; width: 100%; max-width: 380px; }
+  .boia {
+    width: 70px; height: 70px; margin: 0 auto 20px; border-radius: 50%;
+    border: 10px solid #ff6b1a; background: repeating-conic-gradient(#ff6b1a 0deg 30deg, #0d0d0c 30deg 60deg);
+    position: relative;
+  }
+  .boia::after { content: ""; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; background: #161613; border-radius: 50%; }
+  h1 { text-align: center; font-size: 26px; margin-bottom: 6px; }
+  p.sub { text-align: center; color: #a49e93; font-size: 14px; margin-bottom: 24px; }
+  .campo { margin-bottom: 16px; }
+  .campo label { display: block; font-size: 13px; color: #cfcac0; margin-bottom: 6px; }
+  .campo input { width: 100%; background: #0d0d0c; border: 1px solid #2a2a25; color: #f2ede4; padding: 12px; font-size: 14px; border-radius: 4px; }
+  .campo input:focus { outline: none; border-color: #ff6b1a; }
+  button { width: 100%; background: #ff6b1a; color: #0d0d0c; border: none; padding: 12px; font-size: 15px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 8px; }
+  button:hover { background: #ff7d38; }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .rodape { text-align: center; margin-top: 20px; font-size: 13px; color: #a49e93; }
+  .rodape a { color: #ff6b1a; text-decoration: none; }
+  .erro { background: rgba(214,69,69,0.12); border: 1px solid rgba(214,69,69,0.4); color: #ff9d9d;
+    font-size: 13px; padding: 10px 12px; border-radius: 4px; margin-bottom: 16px; display: none; }

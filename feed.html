@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Momentos no Flutuante — Arte Club</title>
+
+  <link rel="stylesheet" href="feed.css">
+  <link rel="stylesheet" href="sair.css">
+
+  <style>
+    /* =====================================
+       FEED EM CARDS
+       (cores do tema: fundo #161613,
+       borda #2a2a25, texto creme #f2ede4,
+       texto suave #a49e93, laranja #ff6b1a)
+    ===================================== */
+
+    #feed {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    #feed > p {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: #a49e93;
+    }
+
+
+    /* ----- CARD ----- */
+
+    .mc {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: #161613;
+      border: 1px solid #2a2a25;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+
+    /* ----- FOTO (tamanho fixo 4:3) ----- */
+
+    .mc-foto {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 4 / 3;
+      background: #0d0d0c;
+      font-size: 28px;
+      overflow: hidden;
+    }
+
+    .mc-foto img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: zoom-in;
+    }
+
+
+    /* ----- CORPO ----- */
+
+    .mc-corpo {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .mc-topo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 28px;
+    }
+
+    .mc-autor {
+      min-width: 0;
+      font-size: 14px;
+      font-weight: bold;
+      color: #f2ede4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mc-texto {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #cfcac0;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+    }
+
+    .mc-texto.aberto {
+      display: block;
+    }
+
+    .mc-vermais {
+      display: none;
+      align-self: flex-start;
+      padding: 0;
+      border: 0;
+      background: none;
+      font-family: inherit;
+      font-size: 12px;
+      color: #ff6b1a;
+      cursor: pointer;
+    }
+
+
+    /* ----- CURTIR / COMENTÁRIOS / DATA ----- */
+
+    .mc-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: #a49e93;
+    }
+
+    .mc-data {
+      margin-left: auto;
+    }
+
+
+    /* ----- BOTÕES (mesmo padrão do Sair) ----- */
+
+    .mc-btn {
+      padding: 4px 9px;
+      border: 1px solid #2a2a25;
+      border-radius: 6px;
+      background: transparent;
+      font-family: inherit;
+      font-size: 12px;
+      line-height: 1.2;
+      color: #a49e93;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .mc-btn:hover:not(:disabled) {
+      background: transparent;
+      color: #ff6b1a;
+      border-color: #ff6b1a;
+    }
+
+    .mc-btn.mc-excluir:hover:not(:disabled) {
+      color: #e53935;
+      border-color: #e53935;
+    }
+
+    .mc-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+
+    /* ----- COMENTÁRIOS ----- */
+
+    .mc-comentarios {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 88px;
+      overflow-y: auto;
+      font-size: 12.5px;
+      line-height: 1.4;
+      color: #cfcac0;
+      overflow-wrap: anywhere;
+    }
+
+    .mc-comentarios:empty {
+      display: none;
+    }
+
+    .mc-comentario b {
+      font-weight: 600;
+      color: #f2ede4;
+    }
+
+    .mc-campo {
+      display: flex;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .mc-campo input {
+      flex: 1;
+      min-width: 0;
+      padding: 6px 9px;
+      border: 1px solid #2a2a25;
+      border-radius: 6px;
+      background: #0d0d0c;
+      font-family: inherit;
+      font-size: 13px;
+      color: #f2ede4;
+    }
+
+    .mc-campo input::placeholder {
+      color: #857f74;
+    }
+
+    .mc-campo input:focus {
+      outline: none;
+      border-color: #ff6b1a;
+    }
+
+
+    /* ----- FOTO AMPLIADA ----- */
+
+    .mc-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(13, 13, 12, 0.94);
+      cursor: zoom-out;
+    }
+
+    .mc-lightbox.aberto {
+      display: flex;
+    }
+
+    .mc-lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .mc-foto {
+        aspect-ratio: 16 / 10;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <a href="feed.html" class="marca">
+    ARTE<span>CLUB</span>
+  </a>
+
+  <div class="usuario-area">
+
+    <span id="usuarioNome" class="usuario-nome">
+      Carregando...
+    </span>
+
+    <span class="badge badge-usuario">
+      Usuário
+    </span>
+
+    <button type="button" id="btnSair" class="botao-sair">
+      Sair
+    </button>
+
+  </div>
+
+</header>
+
+
+<nav class="tabs-nav">
+
+  <a href="agendamento.html" class="tab">
+    Agendar
+  </a>
+
+  <a href="minhas-reservas.html" class="tab">
+    Minhas Reservas
+  </a>
+
+  <a href="feed.html" class="tab ativa">
+    Momentos
+  </a>
+
+</nav>
+
+
+<div class="conteudo">
+
+  <div class="topo-secao">
+
+    <div>
+      <h1>Momentos no Flutuante</h1>
+
+      <p class="sub">
+        Fotos e relatos de quem já passeou.
+      </p>
+    </div>
+
+    <button
+      class="nova"
+      onclick="abrirFormulario()">
+      Nova publicação
+    </button>
+
+  </div>
+
+
+  <!-- FORMULÁRIO DE PUBLICAÇÃO -->
+
+  <div class="form-post" id="form-post">
+
+    <div class="campo">
+
+      <label>
+        Foto do passeio
+      </label>
+
+      <input
+        type="file"
+        id="foto"
+        accept="image/*">
+
+    </div>
+
+
+    <div class="campo">
+
+      <label>
+        Legenda
+      </label>
+
+      <textarea
+        id="texto"
+        rows="2"
+        placeholder="Escreva sobre seu passeio..."></textarea>
+
+    </div>
+
+
+    <button
+      class="publicar"
+      id="btnPublicar"
+      onclick="publicar()">
+
+      Publicar
+
+    </button>
+
+  </div>
+
+
+  <!-- FEED -->
+
+  <div id="feed">
+
+    <p>
+      Carregando publicações...
+    </p>
+
+  </div>
+
+</div>
+
+
+<!-- FOTO AMPLIADA -->
+
+<div class="mc-lightbox" id="lightbox">
+  <img id="lightboxImg" alt="Foto ampliada">
+</div>
+
+
+
+<script type="module">
+
+  import {
+    initializeApp
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    serverTimestamp,
+    doc,
+    updateDoc,
+    increment,
+    deleteDoc
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+  /* =========================
+     CONFIGURAÇÃO FIREBASE
+  ========================= */
+
+  const firebaseConfig = {
+
+    apiKey: "AIzaSyAV9cNfhpCZBZhbALJtLn_PV4aCZBTaWEA",
+
+    authDomain: "arte-club-ebb51.firebaseapp.com",
+
+    projectId: "arte-club-ebb51",
+
+    storageBucket: "arte-club-ebb51.firebasestorage.app",
+
+    messagingSenderId: "449870550765",
+
+    appId: "1:449870550765:web:b1959f2fe96d0ba11f9ee4"
+
+  };
+
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth(app);
+
+  const db = getFirestore(app);
+
+
+  let usuarioAtual = null;
+
+
+  /* =========================
+     VERIFICAR LOGIN
+  ========================= */
+
+  onAuthStateChanged(auth, async (usuario) => {
+
+    if (!usuario) {
+
+      window.location.href = "index.html";
+
+      return;
+    }
+
+
+    usuarioAtual = usuario;
+
+
+    document.getElementById("usuarioNome").textContent =
+      usuario.displayName || usuario.email;
+
+
+    await carregarPosts();
+
+  });
+
+
+  /* =========================
+     SAIR
+  ========================= */
+
+  document
+    .getElementById("btnSair")
+    .addEventListener("click", async () => {
+
+      try {
+
+        await signOut(auth);
+
+        window.location.replace("index.html");
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        alert("Erro ao sair da conta.");
+
+      }
+
+    });
+
+
+  /* =========================
+     FOTO AMPLIADA
+  ========================= */
+
+  const lightbox =
+    document.getElementById("lightbox");
+
+  const lightboxImg =
+    document.getElementById("lightboxImg");
+
+
+  function abrirImagem(origem) {
+
+    lightboxImg.src = origem;
+
+    lightbox.classList.add("aberto");
+
+  }
+
+
+  function fecharImagem() {
+
+    lightbox.classList.remove("aberto");
+
+    lightboxImg.removeAttribute("src");
+
+  }
+
+
+  lightbox.addEventListener(
+    "click",
+    fecharImagem
+  );
+
+
+  document.addEventListener(
+    "keydown",
+    (evento) => {
+
+      if (evento.key === "Escape") {
+
+        fecharImagem();
+
+      }
+
+    }
+  );
+
+
+  /* =========================
+     ABRIR FORMULÁRIO
+  ========================= */
+
+  window.abrirFormulario = function () {
+
+    const formulario =
+      document.getElementById("form-post");
+
+    formulario.classList.toggle("mostrar");
+
+  };
+
+
+  /* =========================
+     COMPRIMIR IMAGEM
+  ========================= */
+
+  function comprimirImagem(file) {
+
+    return new Promise((resolve, reject) => {
+
+      const leitor = new FileReader();
+
+
+      leitor.onload = function (evento) {
+
+        const imagem = new Image();
+
+
+        imagem.onload = function () {
+
+          const canvas =
+            document.createElement("canvas");
+
+
+          let largura = imagem.width;
+
+          let altura = imagem.height;
+
+
+          /*
+             Limite máximo da imagem.
+             Isso reduz bastante o tamanho.
+          */
+
+          const tamanhoMaximo = 1000;
+
+
+          if (largura > altura) {
+
+            if (largura > tamanhoMaximo) {
+
+              altura =
+                altura * tamanhoMaximo / largura;
+
+              largura = tamanhoMaximo;
+
+            }
+
+          } else {
+
+            if (altura > tamanhoMaximo) {
+
+              largura =
+                largura * tamanhoMaximo / altura;
+
+              altura = tamanhoMaximo;
+
+            }
+
+          }
+
+
+          canvas.width = largura;
+
+          canvas.height = altura;
+
+
+          const contexto =
+            canvas.getContext("2d");
+
+
+          contexto.drawImage(
+            imagem,
+            0,
+            0,
+            largura,
+            altura
+          );
+
+
+          /*
+             Converte para JPEG comprimido.
+             0.7 = qualidade da imagem.
+          */
+
+          const base64 =
+            canvas.toDataURL(
+              "image/jpeg",
+              0.7
+            );
+
+
+          resolve(base64);
+
+        };
+
+
+        imagem.onerror = reject;
+
+        imagem.src = evento.target.result;
+
+      };
+
+
+      leitor.onerror = reject;
+
+      leitor.readAsDataURL(file);
+
+    });
+
+  }
+
+
+  /* =========================
+     PUBLICAR
+  ========================= */
+
+  window.publicar = async function () {
+
+    if (!usuarioAtual) {
+
+      alert("Você precisa estar logado.");
+
+      return;
+
+    }
+
+
+    const arquivo =
+      document.getElementById("foto").files[0];
+
+
+    const texto =
+      document.getElementById("texto").value.trim();
+
+
+    if (!arquivo) {
+
+      alert("Escolha uma foto.");
+
+      return;
+
+    }
+
+
+    if (!texto) {
+
+      alert("Escreva uma legenda.");
+
+      return;
+
+    }
+
+
+    /*
+       Limite inicial do arquivo original.
+       A imagem será comprimida depois.
+    */
+
+    if (arquivo.size > 10 * 1024 * 1024) {
+
+      alert(
+        "A imagem é muito grande. Escolha uma foto de até 10 MB."
+      );
+
+      return;
+
+    }
+
+
+    const botao =
+      document.getElementById("btnPublicar");
+
+
+    try {
+
+      botao.disabled = true;
+
+      botao.textContent =
+        "Processando imagem...";
+
+
+      /*
+         Converte e comprime a foto
+         para Base64.
+      */
+
+      const imagemBase64 =
+        await comprimirImagem(arquivo);
+
+
+      /*
+         Verifica aproximadamente
+         o tamanho do Base64.
+      */
+
+      const tamanhoMB =
+        (imagemBase64.length * 0.75)
+        / (1024 * 1024);
+
+
+      if (tamanhoMB > 0.8) {
+
+        alert(
+          "Essa imagem ainda ficou muito grande. Escolha outra foto."
+        );
+
+        botao.disabled = false;
+
+        botao.textContent = "Publicar";
+
+        return;
+
+      }
+
+
+      botao.textContent =
+        "Publicando...";
+
+
+      /*
+         Salva a publicação
+         no Firestore.
+      */
+
+      await addDoc(
+        collection(db, "momentos"),
+        {
+
+          usuario_id:
+            usuarioAtual.uid,
+
+          autor:
+            usuarioAtual.displayName ||
+            usuarioAtual.email,
+
+          texto:
+            texto,
+
+          imagem:
+            imagemBase64,
+
+          curtidas:
+            0,
+
+          criado_em:
+            serverTimestamp()
+
+        }
+      );
+
+
+      alert("Publicação criada com sucesso!");
+
+
+      /*
+         Limpa o formulário.
+      */
+
+      document.getElementById("foto").value = "";
+
+      document.getElementById("texto").value = "";
+
+
+      document
+        .getElementById("form-post")
+        .classList.remove("mostrar");
+
+
+      await carregarPosts();
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+      alert(
+        "Erro ao publicar: " +
+        erro.message
+      );
+
+    }
+
+
+    botao.disabled = false;
+
+    botao.textContent = "Publicar";
+
+  };
+
+
+  /* =========================
+     CARREGAR PUBLICAÇÕES
+  ========================= */
+
+  async function carregarPosts() {
+
+    const feed =
+      document.getElementById("feed");
+
+
+    feed.innerHTML =
+      "<p>Carregando publicações...</p>";
+
+
+    try {
+
+      const consulta = query(
+        collection(db, "momentos"),
+        orderBy("criado_em", "desc")
+      );
+
+
+      const resultado =
+        await getDocs(consulta);
+
+
+      feed.innerHTML = "";
+
+
+      if (resultado.empty) {
+
+        feed.innerHTML = `
+          <p>
+            Ainda não existem publicações.
+          </p>
+        `;
+
+        return;
+
+      }
+
+
+      resultado.forEach((documento) => {
+
+        criarPost(
+          documento.id,
+          documento.data()
+        );
+
+      });
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+
+      feed.innerHTML = `
+        <p>
+          Erro ao carregar as publicações.
+        </p>
+      `;
+
+    }
+
+  }
+
+
+  /* =========================
+     CRIAR CARD NA TELA
+  ========================= */
+
+  function criarPost(id, post) {
+
+    const feed =
+      document.getElementById("feed");
+
+
+    const div =
+      document.createElement("div");
+
+
+    div.className = "mc";
+
+
+    /*
+       Verifica se é o dono da publicação.
+    */
+
+    const souDono =
+      usuarioAtual &&
+      post.usuario_id === usuarioAtual.uid;
+
+
+    let dataTexto =
+      "agora";
+
+
+    if (
+      post.criado_em &&
+      typeof post.criado_em.toDate === "function"
+    ) {
+
+      dataTexto =
+        post.criado_em
+          .toDate()
+          .toLocaleDateString("pt-BR");
+
+    }
+
+
+    const curtidas =
+      Number(post.curtidas) || 0;
+
+
+    /*
+       Sem espaços dentro de
+       .mc-comentarios para o
+       CSS :empty funcionar.
+    */
+
+    div.innerHTML = `
+
+      <div class="mc-foto"></div>
+
+      <div class="mc-corpo">
+
+        <div class="mc-topo">
+
+          <div class="mc-autor">
+            ${escapeHTML(post.autor || "Usuário")}
+          </div>
+
+          ${
+            souDono
+            ?
+            `<button
+              type="button"
+              class="mc-btn mc-excluir"
+              title="Excluir publicação">
+              🗑️
+            </button>`
+            :
+            ""
+          }
+
+        </div>
+
+        <p class="mc-texto">${escapeHTML(post.texto || "")}</p>
+
+        <button
+          type="button"
+          class="mc-vermais">
+          ver mais
+        </button>
+
+        <div class="mc-meta">
+
+          <button
+            type="button"
+            class="mc-btn mc-curtir"
+            data-curtidas="${curtidas}">
+            ♥ ${curtidas}
+          </button>
+
+          <span id="qtd-${id}">💬 0</span>
+
+          <span class="mc-data">${dataTexto}</span>
+
+        </div>
+
+        <div
+          class="mc-comentarios"
+          id="comentarios-${id}"></div>
+
+        <div class="mc-campo">
+
+          <input
+            type="text"
+            id="comentario-${id}"
+            placeholder="Comentar..."
+            maxlength="200">
+
+          <button
+            type="button"
+            class="mc-btn mc-comentar">
+            Enviar
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    /*
+       Foto: criada pelo DOM (e não
+       dentro do texto HTML) e só
+       aceita imagens de verdade.
+    */
+
+    const areaFoto =
+      div.querySelector(".mc-foto");
+
+
+    if (
+      typeof post.imagem === "string" &&
+      post.imagem.startsWith("data:image/")
+    ) {
+
+      const imagem =
+        document.createElement("img");
+
+
+      imagem.src =
+        post.imagem;
+
+      imagem.alt =
+        "Foto do passeio";
+
+      imagem.addEventListener(
+        "click",
+        () => abrirImagem(post.imagem)
+      );
+
+
+      areaFoto.appendChild(imagem);
+
+    } else {
+
+      areaFoto.textContent = "📷";
+
+    }
+
+
+    feed.appendChild(div);
+
+
+    /*
+       "ver mais" só aparece se a
+       legenda for maior que 3 linhas.
+    */
+
+    const textoEl =
+      div.querySelector(".mc-texto");
+
+    const botaoMais =
+      div.querySelector(".mc-vermais");
+
+
+    if (
+      textoEl.scrollHeight >
+      textoEl.clientHeight + 1
+    ) {
+
+      botaoMais.style.display =
+        "inline-block";
+
+
+      botaoMais.addEventListener(
+        "click",
+        () => {
+
+          const aberto =
+            textoEl.classList.toggle(
+              "aberto"
+            );
+
+          botaoMais.textContent =
+            aberto
+              ? "ver menos"
+              : "ver mais";
+
+        }
+      );
+
+    }
+
+
+    /*
+       Botão curtir.
+    */
+
+    const botaoCurtir =
+      div.querySelector(".mc-curtir");
+
+
+    botaoCurtir.addEventListener(
+      "click",
+      () => curtir(id, botaoCurtir)
+    );
+
+
+    /*
+       Botão comentar (e tecla Enter).
+    */
+
+    const botaoComentar =
+      div.querySelector(".mc-comentar");
+
+
+    botaoComentar.addEventListener(
+      "click",
+      () => comentar(id)
+    );
+
+
+    div
+      .querySelector(`#comentario-${id}`)
+      .addEventListener(
+        "keydown",
+        (evento) => {
+
+          if (evento.key === "Enter") {
+
+            evento.preventDefault();
+
+            comentar(id);
+
+          }
+
+        }
+      );
+
+
+    /*
+       Botão excluir.
+    */
+
+    const botaoExcluir =
+      div.querySelector(".mc-excluir");
+
+
+    if (botaoExcluir) {
+
+      botaoExcluir.addEventListener(
+        "click",
+        () => excluirPost(id)
+      );
+
+    }
+
+
+    /*
+       Carregar comentários.
+    */
+
+    carregarComentarios(id);
+
+  }
+
+
+  /* =========================
+     CURTIR
+  ========================= */
+
+  async function curtir(id, botao) {
+
+    botao.disabled = true;
+
+
+    try {
+
+      const referencia =
+        doc(db, "momentos", id);
+
+
+      await updateDoc(
+        referencia,
+        {
+          curtidas: increment(1)
+        }
+      );
+
+
+      /*
+         Atualiza só este card,
+         sem recarregar o feed.
+      */
+
+      const total =
+        Number(botao.dataset.curtidas) + 1;
+
+
+      botao.dataset.curtidas = total;
+
+      botao.textContent = `♥ ${total}`;
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+      alert(
+        "Erro ao curtir a publicação."
+      );
+
+    }
+
+
+    botao.disabled = false;
+
+  }
+
+
+  /* =========================
+     COMENTAR
+  ========================= */
+
+  async function comentar(id) {
+
+    if (!usuarioAtual) return;
+
+
+    const campo =
+      document.getElementById(
+        `comentario-${id}`
+      );
+
+
+    const texto =
+      campo.value.trim();
+
+
+    if (!texto) {
+
+      alert("Digite um comentário.");
+
+      return;
+
+    }
+
+
+    try {
+
+      await addDoc(
+        collection(
+          db,
+          "momentos",
+          id,
+          "comentarios"
+        ),
+        {
+
+          usuario_id:
+            usuarioAtual.uid,
+
+          autor:
+            usuarioAtual.displayName ||
+            usuarioAtual.email,
+
+          texto:
+            texto,
+
+          criado_em:
+            serverTimestamp()
+
+        }
+      );
+
+
+      campo.value = "";
+
+
+      await carregarComentarios(id);
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+      alert(
+        "Erro ao comentar."
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     CARREGAR COMENTÁRIOS
+  ========================= */
+
+  async function carregarComentarios(id) {
+
+    const area =
+      document.getElementById(
+        `comentarios-${id}`
+      );
+
+
+    if (!area) return;
+
+
+    try {
+
+      /*
+         Em ordem: do mais antigo
+         para o mais novo.
+      */
+
+      const consulta = query(
+        collection(
+          db,
+          "momentos",
+          id,
+          "comentarios"
+        ),
+        orderBy("criado_em", "asc")
+      );
+
+
+      const resultado =
+        await getDocs(consulta);
+
+
+      area.innerHTML = "";
+
+
+      resultado.forEach(
+        (documento) => {
+
+          const comentario =
+            documento.data();
+
+
+          const linha =
+            document.createElement("div");
+
+
+          linha.className =
+            "mc-comentario";
+
+
+          linha.innerHTML = `<b>${escapeHTML(
+            comentario.autor ||
+            "Usuário"
+          )}:</b> ${escapeHTML(
+            comentario.texto || ""
+          )}`;
+
+
+          area.appendChild(linha);
+
+        }
+      );
+
+
+      area.scrollTop =
+        area.scrollHeight;
+
+
+      const quantidade =
+        document.getElementById(
+          `qtd-${id}`
+        );
+
+
+      if (quantidade) {
+
+        quantidade.textContent =
+          `💬 ${resultado.size}`;
+
+      }
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+    }
+
+  }
+
+
+  /* =========================
+     EXCLUIR PUBLICAÇÃO
+  ========================= */
+
+  async function excluirPost(id) {
+
+    const confirmar =
+      confirm(
+        "Deseja realmente excluir esta publicação?"
+      );
+
+
+    if (!confirmar) return;
+
+
+    try {
+
+      await deleteDoc(
+        doc(db, "momentos", id)
+      );
+
+
+      await carregarPosts();
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+      alert(
+        "Erro ao excluir a publicação."
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     PROTEGER TEXTO HTML
+  ========================= */
+
+  function escapeHTML(texto) {
+
+    const div =
+      document.createElement("div");
+
+
+    div.textContent = texto;
+
+
+    return div.innerHTML;
+
+  }
+
+</script>
+
+</body>
+</html>

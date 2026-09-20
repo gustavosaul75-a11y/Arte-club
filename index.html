@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+  <title>Entrar - Arte Club</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+  <div class="marca">
+    ARTE<span>CLUB</span>
+  </div>
+
+
+  <div class="card">
+
+
+    <!-- LOGO -->
+
+    <svg
+      viewBox="0 0 200 200"
+      width="70"
+      height="70"
+      style="display:block; margin:0 auto 20px;">
+
+      <circle
+        cx="100"
+        cy="100"
+        r="94"
+        fill="#0d0d0c"
+        stroke="#ff6b1a"
+        stroke-width="4"/>
+
+      <circle
+        cx="100"
+        cy="100"
+        r="82"
+        fill="none"
+        stroke="#ff6b1a"
+        stroke-width="1.5"
+        opacity="0.5"/>
+
+      <g
+        stroke="#ff6b1a"
+        stroke-width="6"
+        stroke-linecap="round">
+
+        <line
+          x1="100"
+          y1="34"
+          x2="100"
+          y2="166"/>
+
+        <line
+          x1="34"
+          y1="100"
+          x2="166"
+          y2="100"/>
+
+        <line
+          x1="53"
+          y1="53"
+          x2="147"
+          y2="147"/>
+
+        <line
+          x1="147"
+          y1="53"
+          x2="53"
+          y2="147"/>
+
+      </g>
+
+
+      <circle
+        cx="100"
+        cy="100"
+        r="46"
+        fill="#0d0d0c"
+        stroke="#ff6b1a"
+        stroke-width="5"/>
+
+
+      <g fill="#ff6b1a">
+
+        <circle cx="100" cy="34" r="6"/>
+        <circle cx="100" cy="166" r="6"/>
+        <circle cx="34" cy="100" r="6"/>
+        <circle cx="166" cy="100" r="6"/>
+
+        <circle cx="53" cy="53" r="6"/>
+        <circle cx="147" cy="147" r="6"/>
+        <circle cx="147" cy="53" r="6"/>
+        <circle cx="53" cy="147" r="6"/>
+
+      </g>
+
+
+      <path
+        d="M 66 106 Q 78 92, 90 106 T 114 106 T 138 106"
+        fill="none"
+        stroke="#f2ede4"
+        stroke-width="5"
+        stroke-linecap="round"/>
+
+
+      <circle
+        cx="100"
+        cy="100"
+        r="46"
+        fill="none"
+        stroke="#ff6b1a"
+        stroke-width="2"
+        opacity="0.4"/>
+
+    </svg>
+
+
+    <h1>Entrar</h1>
+
+
+    <p class="sub">
+      Acesse sua conta para reservar seu horário no flutuante.
+    </p>
+
+
+    <!-- FORMULÁRIO -->
+
+    <form id="loginForm">
+
+      <div class="campo">
+
+        <label for="email">
+          E-mail
+        </label>
+
+        <input
+          type="email"
+          id="email"
+          placeholder="voce@email.com"
+          required>
+
+      </div>
+
+
+      <div class="campo">
+
+        <label for="senha">
+          Senha
+        </label>
+
+        <input
+          type="password"
+          id="senha"
+          placeholder="••••••••"
+          required>
+
+      </div>
+
+
+      <button type="submit">
+        Entrar
+      </button>
+
+
+    </form>
+
+
+    <p class="rodape">
+
+      Ainda não tem conta?
+
+      <a href="cadastro.html">
+        Criar conta
+      </a>
+
+    </p>
+
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- FIREBASE -->
+  <!-- ========================================= -->
+
+  <script type="module">
+
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      setPersistence,
+      browserLocalPersistence
+    }
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    }
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+
+    // =========================================
+    // CONFIGURAÇÃO DO FIREBASE
+    // =========================================
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyAV9cNfhpCZBZhbALJtLn_PV4aCZBTaWEA",
+
+      authDomain:
+        "arte-club-ebb51.firebaseapp.com",
+
+      projectId:
+        "arte-club-ebb51",
+
+      storageBucket:
+        "arte-club-ebb51.firebasestorage.app",
+
+      messagingSenderId:
+        "449870550765",
+
+      appId:
+        "1:449870550765:web:b1959f2fe96d0ba11f9ee4"
+
+    };
+
+
+    // =========================================
+    // INICIAR FIREBASE
+    // =========================================
+
+    const app =
+      initializeApp(firebaseConfig);
+
+    const auth =
+      getAuth(app);
+
+    const db =
+      getFirestore(app);
+
+
+    // =========================================
+    // FORMULÁRIO
+    // =========================================
+
+    const formulario =
+      document.getElementById("loginForm");
+
+
+    formulario.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+
+        const email =
+          document
+            .getElementById("email")
+            .value
+            .trim();
+
+
+        const senha =
+          document
+            .getElementById("senha")
+            .value;
+
+
+        const botao =
+          formulario.querySelector("button");
+
+
+        botao.disabled = true;
+
+        botao.textContent =
+          "Entrando...";
+
+
+        try {
+
+          // =====================================
+          // MANTER LOGIN SALVO
+          // =====================================
+
+          await setPersistence(
+            auth,
+            browserLocalPersistence
+          );
+
+
+          // =====================================
+          // FAZER LOGIN
+          // =====================================
+
+          const resultado =
+            await signInWithEmailAndPassword(
+              auth,
+              email,
+              senha
+            );
+
+
+          const usuario =
+            resultado.user;
+
+
+          console.log(
+            "Login realizado:",
+            usuario.uid
+          );
+
+
+          // =====================================
+          // BUSCAR USUÁRIO NO FIRESTORE
+          // =====================================
+
+          const referencia =
+            doc(
+              db,
+              "usuarios",
+              usuario.uid
+            );
+
+
+          const documento =
+            await getDoc(referencia);
+
+
+          // =====================================
+          // VERIFICAR DOCUMENTO
+          // =====================================
+
+          if (!documento.exists()) {
+
+            alert(
+              "Seu cadastro não foi encontrado no sistema."
+            );
+
+            botao.disabled = false;
+
+            botao.textContent =
+              "Entrar";
+
+            return;
+
+          }
+
+
+          // =====================================
+          // PEGAR TIPO DO USUÁRIO
+          // =====================================
+
+          const dados =
+            documento.data();
+
+
+          const tipo =
+            dados.tipo_usuario || "usuario";
+
+
+          console.log(
+            "Tipo de usuário:",
+            tipo
+          );
+
+
+          // =====================================
+          // REDIRECIONAMENTO
+          // =====================================
+
+          if (tipo === "admin") {
+
+            window.location.replace(
+              "adm.html"
+            );
+
+          }
+
+          else if (tipo === "executor") {
+
+            window.location.replace(
+              "executor.html"
+            );
+
+          }
+
+          else {
+
+            window.location.replace(
+              "agendamento.html"
+            );
+
+          }
+
+        }
+
+
+        catch (error) {
+
+          console.error(
+            "Erro completo:",
+            error
+          );
+
+
+          // =====================================
+          // ERROS DO FIREBASE
+          // =====================================
+
+          if (
+            error.code ===
+            "auth/invalid-credential"
+          ) {
+
+            alert(
+              "E-mail ou senha incorretos."
+            );
+
+          }
+
+          else if (
+            error.code ===
+            "auth/user-not-found"
+          ) {
+
+            alert(
+              "Essa conta não existe."
+            );
+
+          }
+
+          else if (
+            error.code ===
+            "auth/wrong-password"
+          ) {
+
+            alert(
+              "Senha incorreta."
+            );
+
+          }
+
+          else if (
+            error.code ===
+            "auth/invalid-email"
+          ) {
+
+            alert(
+              "Digite um e-mail válido."
+            );
+
+          }
+
+          else {
+
+            alert(
+              "Erro ao fazer login:\n\n" +
+              error.message
+            );
+
+          }
+
+
+          botao.disabled = false;
+
+          botao.textContent =
+            "Entrar";
+
+        }
+
+      }
+    );
+
+  </script>
+
+
+</body>
+
+</html>

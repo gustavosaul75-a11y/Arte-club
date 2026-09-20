@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Painel do Administrador — Arte Club</title>
+
+<link rel="stylesheet"
+      href="adm.css">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+  <a href="adm.html" class="marca">
+
+    ARTE<span>CLUB</span>
+
+    <span class="cargo">
+      Painel do Administrador
+    </span>
+
+  </a>
+
+
+  <button
+    id="btnSair"
+    class="sair">
+
+    Sair
+
+  </button>
+
+</header>
+
+
+
+<div class="conteudo">
+
+  <h1>
+    Administração
+  </h1>
+
+
+  <p class="sub">
+    Gerencie usuários, reservas e publicações do sistema.
+  </p>
+
+
+
+  <!-- CONTADORES -->
+
+  <div
+    class="contador"
+    id="contador">
+
+    <div>
+
+      <div class="num">
+        0
+      </div>
+
+      <div class="rotulo">
+        Usuários
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <div class="num">
+        0
+      </div>
+
+      <div class="rotulo">
+        Reservas
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <div class="num">
+        0
+      </div>
+
+      <div class="rotulo">
+        Publicações
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ABAS -->
+
+  <div class="abas">
+
+    <button
+      class="ativa"
+      onclick="mostrar('usuarios', this)">
+
+      Usuários
+
+    </button>
+
+
+    <button
+      onclick="mostrar('reservas', this)">
+
+      Reservas
+
+    </button>
+
+
+    <button
+      onclick="mostrar('publicacoes', this)">
+
+      Publicações
+
+    </button>
+
+  </div>
+
+
+
+  <!-- =========================
+       USUÁRIOS
+  ========================== -->
+
+  <div
+    class="painel ativo"
+    id="painel-usuarios">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Nome</th>
+
+          <th>E-mail</th>
+
+          <th>Tipo</th>
+
+          <th>Ação</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="tabelaUsuarios">
+
+        <tr>
+
+          <td colspan="4">
+            Carregando usuários...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+
+  <!-- =========================
+       RESERVAS
+  ========================== -->
+
+  <div
+    class="painel"
+    id="painel-reservas">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Cliente</th>
+
+          <th>Data</th>
+
+          <th>Status</th>
+
+          <th>Executor</th>
+
+          <th>Ação</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="tabelaReservas">
+
+        <tr>
+
+          <td colspan="5">
+            Carregando reservas...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+
+  <!-- =========================
+       PUBLICAÇÕES
+  ========================== -->
+
+  <div
+    class="painel"
+    id="painel-publicacoes">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Autor</th>
+
+          <th>Legenda</th>
+
+          <th>Data</th>
+
+          <th>Ação</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="tabelaPublicacoes">
+
+        <tr>
+
+          <td colspan="4">
+            Carregando publicações...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+
+
+<script type="module">
+
+
+/* =====================================
+   FIREBASE
+===================================== */
+
+import {
+  initializeApp
+} from
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  updateDoc,
+  deleteDoc
+} from
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+
+/* =====================================
+   CONFIGURAÇÃO
+===================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyAV9cNfhpCZBZhbALJtLn_PV4aCZBTaWEA",
+
+  authDomain:
+    "arte-club-ebb51.firebaseapp.com",
+
+  projectId:
+    "arte-club-ebb51",
+
+  storageBucket:
+    "arte-club-ebb51.firebasestorage.app",
+
+  messagingSenderId:
+    "449870550765",
+
+  appId:
+    "1:449870550765:web:b1959f2fe96d0ba11f9ee4"
+
+};
+
+
+
+const app =
+  initializeApp(firebaseConfig);
+
+
+const auth =
+  getAuth(app);
+
+
+const db =
+  getFirestore(app);
+
+
+
+/* =====================================
+   ELEMENTOS
+===================================== */
+
+const tabelaUsuarios =
+  document.getElementById(
+    "tabelaUsuarios"
+  );
+
+
+const tabelaReservas =
+  document.getElementById(
+    "tabelaReservas"
+  );
+
+
+const tabelaPublicacoes =
+  document.getElementById(
+    "tabelaPublicacoes"
+  );
+
+
+const contador =
+  document.getElementById(
+    "contador"
+  );
+
+
+const btnSair =
+  document.getElementById(
+    "btnSair"
+  );
+
+
+
+/* =====================================
+   VERIFICAR ADMIN
+===================================== */
+
+onAuthStateChanged(
+  auth,
+  async (usuario) => {
+
+    if (!usuario) {
+
+      window.location.href =
+        "index.html";
+
+      return;
+
+    }
+
+
+    try {
+
+      const referencia =
+        doc(
+          db,
+          "usuarios",
+          usuario.uid
+        );
+
+
+      const resultado =
+        await getDoc(referencia);
+
+
+      if (!resultado.exists()) {
+
+        alert(
+          "Seu cadastro não foi encontrado."
+        );
+
+        await signOut(auth);
+
+        window.location.href =
+          "index.html";
+
+        return;
+
+      }
+
+
+      const dados =
+        resultado.data();
+
+
+      /*
+        Só permite entrar no painel
+        se tipo_usuario for admin.
+      */
+
+      if (
+        dados.tipo_usuario !==
+        "admin"
+      ) {
+
+        alert(
+          "Você não tem permissão para acessar o painel."
+        );
+
+        window.location.href =
+          "index.html";
+
+        return;
+
+      }
+
+
+      /*
+        Carrega os dados.
+      */
+
+      await carregarTudo();
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+      alert(
+        "Erro ao verificar administrador."
+      );
+
+    }
+
+  }
+);
+
+
+
+/* =====================================
+   SAIR
+===================================== */
+
+btnSair.addEventListener(
+  "click",
+  async () => {
+
+    await signOut(auth);
+
+    window.location.href =
+      "index.html";
+
+  }
+);
+
+
+
+/* =====================================
+   CARREGAR TUDO
+===================================== */
+
+async function carregarTudo() {
+
+  await carregarUsuarios();
+
+  await carregarReservas();
+
+  await carregarPublicacoes();
+
+}
+
+
+
+/* =====================================
+   USUÁRIOS
+===================================== */
+
+async function carregarUsuarios() {
+
+  try {
+
+    const resultado =
+      await getDocs(
+        collection(
+          db,
+          "usuarios"
+        )
+      );
+
+
+    tabelaUsuarios.innerHTML = "";
+
+
+    let quantidade = 0;
+
+
+    resultado.forEach(
+      (documento) => {
+
+        quantidade++;
+
+
+        const usuario =
+          documento.data();
+
+
+        const id =
+          documento.id;
+
+
+        const tipo =
+          usuario.tipo_usuario ||
+          "usuario";
+
+
+        let textoTipo =
+          "Usuário";
+
+
+        if (tipo === "executor") {
+
+          textoTipo =
+            "Executor";
+
+        }
+
+
+        if (tipo === "admin") {
+
+          textoTipo =
+            "Administrador";
+
+        }
+
+
+        const tr =
+          document.createElement("tr");
+
+
+        tr.innerHTML = `
+
+          <td>
+            ${escapeHTML(
+              usuario.nome ||
+              "Sem nome"
+            )}
+          </td>
+
+
+          <td>
+            ${escapeHTML(
+              usuario.email ||
+              "-"
+            )}
+          </td>
+
+
+          <td>
+
+            <span
+              class="tipo ${tipo}">
+
+              ${textoTipo}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            <select
+              class="acao"
+              onchange="alterarTipo('${id}', this.value)">
+
+              <option
+                value="usuario"
+                ${tipo === "usuario" ? "selected" : ""}>
+
+                Usuário
+
+              </option>
+
+
+              <option
+                value="executor"
+                ${tipo === "executor" ? "selected" : ""}>
+
+                Executor
+
+              </option>
+
+
+              <option
+                value="admin"
+                ${tipo === "admin" ? "selected" : ""}>
+
+                Administrador
+
+              </option>
+
+            </select>
+
+          </td>
+
+        `;
+
+
+        tabelaUsuarios.appendChild(tr);
+
+      }
+    );
+
+
+    atualizarContador(
+      0,
+      quantidade
+    );
+
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    tabelaUsuarios.innerHTML = `
+
+      <tr>
+
+        <td colspan="4">
+
+          Erro ao carregar usuários.
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+}
+
+
+
+/* =====================================
+   ALTERAR TIPO
+===================================== */
+
+window.alterarTipo =
+  async function(
+    id,
+    novoTipo
+  ) {
+
+    try {
+
+      await updateDoc(
+
+        doc(
+          db,
+          "usuarios",
+          id
+        ),
+
+        {
+
+          tipo_usuario:
+            novoTipo
+
+        }
+
+      );
+
+
+      alert(
+        "Tipo de usuário atualizado!"
+      );
+
+
+      await carregarUsuarios();
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+
+      alert(
+        "Erro ao alterar o tipo."
+      );
+
+    }
+
+  };
+
+
+
+/* =====================================
+   RESERVAS
+===================================== */
+
+async function carregarReservas() {
+
+  try {
+
+    const resultado =
+      await getDocs(
+        collection(
+          db,
+          "reservas"
+        )
+      );
+
+
+    tabelaReservas.innerHTML = "";
+
+
+    let quantidade = 0;
+
+
+    /*
+      Primeiro pegamos os executores.
+    */
+
+    const executores =
+      await buscarExecutores();
+
+
+    resultado.forEach(
+      (documento) => {
+
+        quantidade++;
+
+
+        const reserva =
+          documento.data();
+
+
+        const id =
+          documento.id;
+
+
+        const tr =
+          document.createElement("tr");
+
+
+        let statusTexto =
+          "Pendente";
+
+
+        if (
+          reserva.status ===
+          "confirmada"
+        ) {
+
+          statusTexto =
+            "Confirmada";
+
+        }
+
+
+        if (
+          reserva.status ===
+          "concluida"
+        ) {
+
+          statusTexto =
+            "Concluída";
+
+        }
+
+
+        if (
+          reserva.status ===
+          "cancelada"
+        ) {
+
+          statusTexto =
+            "Cancelada";
+
+        }
+
+
+        /*
+          Monta lista de executores.
+        */
+
+        let opcoes =
+          `<option value="">Sem executor</option>`;
+
+
+        executores.forEach(
+          (executor) => {
+
+            opcoes += `
+
+              <option
+                value="${executor.id}"
+                ${
+                  reserva.executor_id ===
+                  executor.id
+                    ? "selected"
+                    : ""
+                }>
+
+                ${escapeHTML(
+                  executor.nome ||
+                  executor.email
+                )}
+
+              </option>
+
+            `;
+
+          }
+        );
+
+
+        tr.innerHTML = `
+
+          <td>
+
+            ${escapeHTML(
+              reserva.nome_usuario ||
+              "Cliente"
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${formatarData(
+              reserva.data_reserva
+            )}
+
+            às
+
+            ${reserva.horario || "--:--"}
+
+            <br>
+
+            ${reserva.quantidade_pessoas || 0}
+            pessoas
+
+          </td>
+
+
+          <td>
+
+            <span
+              class="status ${reserva.status}">
+
+              ${statusTexto}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            <select
+              class="acao"
+              onchange="atribuirExecutor('${id}', this.value)">
+
+              ${opcoes}
+
+            </select>
+
+          </td>
+
+
+          <td>
+
+            ${
+              reserva.status ===
+              "pendente"
+
+              ?
+
+              `
+
+              <button
+                class="acao"
+                onclick="confirmarReserva('${id}')">
+
+                Confirmar
+
+              </button>
+
+              `
+
+              :
+
+              ""
+
+            }
+
+          </td>
+
+        `;
+
+
+        tabelaReservas.appendChild(tr);
+
+      }
+    );
+
+
+    atualizarContador(
+      1,
+      quantidade
+    );
+
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    tabelaReservas.innerHTML = `
+
+      <tr>
+
+        <td colspan="5">
+
+          Erro ao carregar reservas.
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+}
+
+
+
+/* =====================================
+   BUSCAR EXECUTORES
+===================================== */
+
+async function buscarExecutores() {
+
+  const resultado =
+    await getDocs(
+      collection(
+        db,
+        "usuarios"
+      )
+    );
+
+
+  const executores = [];
+
+
+  resultado.forEach(
+    (documento) => {
+
+      const dados =
+        documento.data();
+
+
+      if (
+        dados.tipo_usuario ===
+        "executor"
+      ) {
+
+        executores.push({
+
+          id:
+            documento.id,
+
+          ...dados
+
+        });
+
+      }
+
+    }
+  );
+
+
+  return executores;
+
+}
+
+
+
+/* =====================================
+   ATRIBUIR EXECUTOR
+===================================== */
+
+window.atribuirExecutor =
+  async function(
+    reservaId,
+    executorId
+  ) {
+
+    try {
+
+      await updateDoc(
+
+        doc(
+          db,
+          "reservas",
+          reservaId
+        ),
+
+        {
+
+          executor_id:
+            executorId || null,
+
+          /*
+            Ao atribuir executor,
+            podemos confirmar a reserva.
+          */
+
+          status:
+            executorId
+              ? "confirmada"
+              : "pendente"
+
+        }
+
+      );
+
+
+      alert(
+        executorId
+          ? "Executor atribuído!"
+          : "Executor removido."
+      );
+
+
+      await carregarReservas();
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+
+      alert(
+        "Erro ao atribuir executor."
+      );
+
+    }
+
+  };
+
+
+
+/* =====================================
+   CONFIRMAR RESERVA
+===================================== */
+
+window.confirmarReserva =
+  async function(id) {
+
+    try {
+
+      await updateDoc(
+
+        doc(
+          db,
+          "reservas",
+          id
+        ),
+
+        {
+
+          status:
+            "confirmada"
+
+        }
+
+      );
+
+
+      await carregarReservas();
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+
+      alert(
+        "Erro ao confirmar reserva."
+      );
+
+    }
+
+  };
+
+
+
+/* =====================================
+   PUBLICAÇÕES
+===================================== */
+
+async function carregarPublicacoes() {
+
+  try {
+
+    const resultado =
+      await getDocs(
+        collection(
+          db,
+          "momentos"
+        )
+      );
+
+
+    tabelaPublicacoes.innerHTML = "";
+
+
+    let quantidade = 0;
+
+
+    resultado.forEach(
+      (documento) => {
+
+        quantidade++;
+
+
+        const post =
+          documento.data();
+
+
+        const id =
+          documento.id;
+
+
+        let data =
+          "-";
+
+
+        if (post.criado_em) {
+
+          data =
+            post.criado_em
+              .toDate()
+              .toLocaleDateString(
+                "pt-BR"
+              );
+
+        }
+
+
+        const tr =
+          document.createElement("tr");
+
+
+        tr.innerHTML = `
+
+          <td>
+
+            ${escapeHTML(
+              post.autor ||
+              "Usuário"
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHTML(
+              post.texto ||
+              ""
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${data}
+
+          </td>
+
+
+          <td>
+
+            <button
+              class="remover"
+              onclick="removerPublicacao('${id}')">
+
+              Remover
+
+            </button>
+
+          </td>
+
+        `;
+
+
+        tabelaPublicacoes.appendChild(tr);
+
+      }
+    );
+
+
+    atualizarContador(
+      2,
+      quantidade
+    );
+
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    tabelaPublicacoes.innerHTML = `
+
+      <tr>
+
+        <td colspan="4">
+
+          Erro ao carregar publicações.
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+}
+
+
+
+/* =====================================
+   REMOVER PUBLICAÇÃO
+===================================== */
+
+window.removerPublicacao =
+  async function(id) {
+
+    const confirmar =
+      confirm(
+        "Deseja realmente remover esta publicação?"
+      );
+
+
+    if (!confirmar) {
+
+      return;
+
+    }
+
+
+    try {
+
+      await deleteDoc(
+
+        doc(
+          db,
+          "momentos",
+          id
+        )
+
+      );
+
+
+      alert(
+        "Publicação removida."
+      );
+
+
+      await carregarPublicacoes();
+
+
+    } catch (erro) {
+
+      console.error(erro);
+
+
+      alert(
+        "Erro ao remover publicação."
+      );
+
+    }
+
+  };
+
+
+
+/* =====================================
+   CONTADORES
+===================================== */
+
+let totalUsuarios = 0;
+
+let totalReservas = 0;
+
+let totalPublicacoes = 0;
+
+
+
+function atualizarContador(
+  tipo,
+  quantidade
+) {
+
+  if (tipo === 0) {
+
+    totalUsuarios =
+      quantidade;
+
+  }
+
+
+  if (tipo === 1) {
+
+    totalReservas =
+      quantidade;
+
+  }
+
+
+  if (tipo === 2) {
+
+    totalPublicacoes =
+      quantidade;
+
+  }
+
+
+  contador.innerHTML = `
+
+    <div>
+
+      <div class="num">
+        ${totalUsuarios}
+      </div>
+
+      <div class="rotulo">
+        Usuários
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <div class="num">
+        ${totalReservas}
+      </div>
+
+      <div class="rotulo">
+        Reservas
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <div class="num">
+        ${totalPublicacoes}
+      </div>
+
+      <div class="rotulo">
+        Publicações
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+
+/* =====================================
+   ABAS
+===================================== */
+
+window.mostrar =
+  function(
+    nome,
+    botao
+  ) {
+
+    [
+      "usuarios",
+      "reservas",
+      "publicacoes"
+    ].forEach(
+      (n) => {
+
+        document
+          .getElementById(
+            "painel-" + n
+          )
+          .classList.toggle(
+            "ativo",
+            n === nome
+          );
+
+      }
+    );
+
+
+    document
+      .querySelectorAll(
+        ".abas button"
+      )
+      .forEach(
+        (b) => {
+
+          b.classList.remove(
+            "ativa"
+          );
+
+        }
+      );
+
+
+    botao.classList.add(
+      "ativa"
+    );
+
+  };
+
+
+
+/* =====================================
+   DATA
+===================================== */
+
+function formatarData(data) {
+
+  if (!data) {
+
+    return "--/--/----";
+
+  }
+
+
+  const partes =
+    data.split("-");
+
+
+  if (
+    partes.length !== 3
+  ) {
+
+    return data;
+
+  }
+
+
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+}
+
+
+
+/* =====================================
+   SEGURANÇA DO TEXTO
+===================================== */
+
+function escapeHTML(texto) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    texto;
+
+
+  return div.innerHTML;
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

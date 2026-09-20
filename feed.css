@@ -1,0 +1,249 @@
+   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0d0c;
+    color: #f2ede4;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    padding: 0 24px 40px;
+  }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 800px; margin: 0 auto; padding: 20px 0;
+    border-bottom: 1px solid #2a2a25; flex-wrap: wrap; gap: 10px;
+  }
+  .marca { font-size: 22px; font-weight: bold; letter-spacing: 1px; text-decoration: none; color: #f2ede4; }
+  .marca span { color: #ff6b1a; }
+
+  .usuario-area { display: flex; align-items: center; gap: 12px; }
+  .usuario-nome { font-size: 14px; color: #cfcac0; }
+  .badge { font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+  .badge-usuario { background: rgba(255,107,26,0.15); color: #ff6b1a; }
+  .btn-sair {
+    color: #a49e93; text-decoration: none; font-size: 13px;
+    border: 1px solid #2a2a25; padding: 6px 12px; border-radius: 4px;
+  }
+  .btn-sair:hover { border-color: #ff6b1a; color: #ff6b1a; }
+
+  .tabs-nav {
+    display: flex; gap: 6px; max-width: 800px; margin: 0 auto 32px;
+    padding-top: 14px; overflow-x: auto; justify-content:center;
+  }
+  .tabs-nav .tab {
+    color: #a49e93; text-decoration: none; font-size: 14px;
+    padding: 10px 16px; border-radius: 6px; white-space: nowrap;
+  }
+  .tabs-nav .tab.ativa { background: #ff6b1a; color: #0d0d0c; font-weight: bold; }
+  .tabs-nav .tab:hover:not(.ativa) { color: #f2ede4; }
+
+  .conteudo { max-width: 700px; margin: 0 auto; }
+
+  .topo-secao {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 14px; margin-bottom: 26px;
+  }
+  h1 { font-size: 26px; margin-bottom: 6px; }
+  p.sub { color: #a49e93; font-size: 14px; }
+
+  button.nova {
+    background: #ff6b1a; color: #0d0d0c; border: none; padding: 10px 18px;
+    font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; white-space: nowrap;
+  }
+  button.nova:hover { background: #ff7d38; }
+
+  .form-post {
+    display: none; background: #161613; border: 1px solid #2a2a25;
+    border-radius: 6px; padding: 20px; margin-bottom: 28px;
+  }
+  .form-post.mostrar { display: block; }
+
+  .campo { margin-bottom: 14px; }
+  .campo label { display: block; font-size: 13px; color: #cfcac0; margin-bottom: 6px; }
+  .campo input, .campo textarea {
+    width: 100%; background: #0d0d0c; border: 1px solid #2a2a25; color: #f2ede4;
+    padding: 10px 12px; font-size: 14px; border-radius: 4px;
+    font-family: Arial, Helvetica, sans-serif; resize: vertical;
+  }
+  .campo input:focus, .campo textarea:focus { outline: none; border-color: #ff6b1a; }
+
+  button.publicar {
+    background: #ff6b1a; color: #0d0d0c; border: none; padding: 10px 18px;
+    font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer;
+  }
+  button.publicar:hover { background: #ff7d38; }
+
+  .post {
+    background: #161613; border: 1px solid #2a2a25; border-radius: 6px;
+    overflow: hidden; margin-bottom: 20px;
+  }
+  .foto {
+    aspect-ratio: 16 / 9;
+    background: repeating-linear-gradient(135deg, #2a1a10, #2a1a10 12px, #241a12 12px, #241a12 24px);
+    position: relative;
+  }
+  .foto::after {
+    content: "🌊"; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 32px; opacity: 0.4;
+  }
+  .corpo { padding: 16px 18px; }
+  .autor { font-size: 14px; color: #ff6b1a; font-weight: bold; margin-bottom: 6px; }
+  .texto { font-size: 14px; color: #e6e1d8; margin-bottom: 12px; }
+  .meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: #a49e93; }
+  .meta button { background: none; border: none; color: #a49e93; font-size: 13px; cursor: pointer; padding: 0; }
+  .meta button:hover { color: #ff6b1a; }
+  .comentarios { margin-top: 12px; padding-top: 10px; border-top: 1px solid #2a2a25; }
+  .comentario { font-size: 13px; margin-bottom: 6px; color: #cfcac0; }
+  .comentario b { color: #f2ede4; }
+
+/* =====================================
+   BOTÃO SAIR — padrão único do Arte Club
+
+   Usado em todas as telas:
+   executor, adm, agendamento,
+   minhas-reservas e feed.
+
+   Medido a partir da tela
+   "Minhas Reservas" (tema escuro):
+
+   fundo    transparente (#0d0d0c da página)
+   borda    1px #2a2a25
+   texto    #a49e93
+   raio     6px
+===================================== */
+
+header .botao-sair {
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  padding: 6px 12px;
+
+  border: 1px solid #2a2a25;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #a49e93;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.2;
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition: color 0.2s, border-color 0.2s;
+
+}
+
+
+header .botao-sair:hover {
+
+  color: #f2ede4;
+  border-color: #a49e93;
+
+}
+
+
+header .botao-sair:active {
+
+  color: #f2ede4;
+  border-color: #f2ede4;
+
+}
+
+
+header .botao-sair:focus-visible {
+
+  outline: 1px solid #f2ede4;
+  outline-offset: 2px;
+
+}
+
+
+header .botao-sair:disabled {
+
+  opacity: 0.5;
+  cursor: not-allowed;
+
+}
+
+/* =====================================
+   BOTÃO SAIR — padrão único do Arte Club
+
+   Usado em todas as telas:
+   executor, adm, agendamento,
+   minhas-reservas e feed.
+
+   Medido a partir da tela
+   "Minhas Reservas" (tema escuro):
+
+   fundo    transparente (#0d0d0c da página)
+   borda    1px #2a2a25
+   texto    #a49e93
+   raio     6px
+===================================== */
+
+header .botao-sair {
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  padding: 6px 12px;
+
+  border: 1px solid #2a2a25;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #a49e93;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.2;
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition: color 0.2s, border-color 0.2s;
+
+}
+
+
+header .botao-sair:hover {
+
+  background: transparent;
+  color: #ff6b1a;
+  border-color: #ff6b1a;
+
+}
+
+
+header .botao-sair:active {
+
+  background: transparent;
+  color: #e85b0d;
+  border-color: #e85b0d;
+
+}
+
+
+header .botao-sair:focus-visible {
+
+  outline: 1px solid #ff6b1a;
+  outline-offset: 2px;
+
+}
+
+
+header .botao-sair:disabled {
+
+  opacity: 0.5;
+  cursor: not-allowed;
+
+}

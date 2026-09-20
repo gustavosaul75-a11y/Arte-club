@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamentos - Arte Club</title>
+  <link rel="stylesheet" href="agenda.css">
+  <link rel="stylesheet" href="sair.css">
+
+  <style>
+    /* ===== BOTÃO SAIR (padrão do site) ===== */
+
+    header.topbar .usuario-area .botao-sair {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: auto;
+      padding: 6px 12px;
+      border: 1px solid #2a2a25;
+      border-radius: 6px;
+      background: transparent;
+      color: #a49e93;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: normal;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    header.topbar .usuario-area .botao-sair:hover,
+    header.topbar .usuario-area .botao-sair:focus-visible {
+      background: transparent;
+      color: #ff6b1a;
+      border-color: #ff6b1a;
+    }
+
+    header.topbar .usuario-area .botao-sair:active {
+      background: transparent;
+      color: #e85b0d;
+      border-color: #e85b0d;
+    }
+
+    /* ===== CALENDÁRIO ===== */
+
+    .calendario-box {
+      margin-top: 25px;
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+
+    .calendario-topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .calendario-topo button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 10px;
+      background: #ff6b1a;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .calendario-topo h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #222;
+    }
+
+    .dica-calendario {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: #777;
+      text-align: center;
+    }
+
+    .semana {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .semana div {
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #777;
+    }
+
+    .dias {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .dia {
+      min-height: 42px;
+      border: none;
+      border-radius: 10px;
+      background: #f5f5f5;
+      cursor: pointer;
+      font-size: 14px;
+      position: relative;
+      transition: 0.2s;
+    }
+
+    .dia:hover {
+      background: #ffe0cf;
+    }
+
+    .dia.vazio {
+      background: transparent;
+      cursor: default;
+    }
+
+    .dia.hoje {
+      border: 2px solid #ff6b1a;
+    }
+
+    .dia.selecionado,
+    .dia.selecionado:hover {
+      background: #ff6b1a;
+      color: white;
+      font-weight: bold;
+    }
+
+    .dia.passado {
+      color: #bbb;
+      cursor: not-allowed;
+    }
+
+    .dia.passado:hover {
+      background: #f5f5f5;
+    }
+
+    /* Dia reservado por alguém: o flutuante é alugado o dia todo */
+
+    .dia.ocupado-dia,
+    .dia.ocupado-dia:hover {
+      background: #fdecea;
+      color: #e53935;
+      cursor: not-allowed;
+    }
+
+    .dia.ocupado-dia::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #e53935;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* ===== DIAS ESCOLHIDOS + CHEGADA ===== */
+
+    .horarios-box {
+      margin-top: 25px;
+      display: none;
+    }
+
+    .horarios-box h3 {
+      margin-bottom: 5px;
+      color: #f2ede4;
+    }
+
+    .data-escolhida {
+      color: #a49e93;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .btn-limpar {
+      padding: 6px 12px;
+      border: 1px solid #2a2a25;
+      border-radius: 6px;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 1.2;
+      color: #a49e93;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-limpar:hover {
+      background: transparent;
+      color: #ff6b1a;
+      border-color: #ff6b1a;
+    }
+
+    .chegada-campo {
+      margin-top: 20px;
+    }
+
+    .chegada-campo label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+      color: #f2ede4;
+    }
+
+    .chegada-campo select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .chegada-dica {
+      margin: 8px 0 0;
+      font-size: 13px;
+      color: #a49e93;
+    }
+
+    /* ===== PESSOAS ===== */
+
+    .pessoas-box {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .pessoas-box label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+      color: #f2ede4;
+    }
+
+    .pessoas-box input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    /* ===== BOTÃO ===== */
+
+    .btn-confirmar {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #ff6b1a;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+    }
+
+    .btn-confirmar:hover {
+      background: #e85b0d;
+    }
+
+    .btn-confirmar:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .legenda {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .legenda-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .bolinha {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .bolinha.livre {
+      background: #ff6b1a;
+    }
+
+    .bolinha.ocupada {
+      background: #e53935;
+    }
+
+    @media (max-width: 500px) {
+      .calendario-box {
+        padding: 15px;
+      }
+
+      .dia {
+        min-height: 38px;
+      }
+      
+      
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <a href="agendamento.html" class="marca">
+    ARTE<span>CLUB</span>
+  </a>
+
+  <div class="usuario-area">
+    <span class="usuario-nome" id="nomeUsuario">Usuário</span>
+
+    <span class="badge badge-usuario">
+      Usuário
+    </span>
+
+    <button type="button" id="btnSair" class="botao-sair">
+      Sair
+    </button>
+  </div>
+
+</header>
+
+<nav class="tabs-nav">
+  <a href="agendamento.html" class="tab ativa">Agendar</a>
+  <a href="minhas-reservas.html" class="tab">Minhas Reservas</a>
+  <a href="feed.html" class="tab">Momentos</a>
+</nav>
+
+<div class="conteudo">
+
+  <div class="card">
+
+    <div class="boia"></div>
+
+    <h1>Agendar passeio</h1>
+
+    <p class="sub">
+      O flutuante é alugado por dia inteiro.
+      Escolha os dias e o horário em que você chega.
+    </p>
+
+    <!-- CALENDÁRIO -->
+    <div class="calendario-box">
+
+      <div class="calendario-topo">
+
+        <button type="button" id="mesAnterior">
+          ‹
+        </button>
+
+        <h2 id="mesAno"></h2>
+
+        <button type="button" id="mesProximo">
+          ›
+        </button>
+
+      </div>
+
+      <p class="dica-calendario">
+        Toque nos dias que quiser. Toque de novo para remover.
+      </p>
+
+      <div class="semana">
+        <div>DOM</div>
+        <div>SEG</div>
+        <div>TER</div>
+        <div>QUA</div>
+        <div>QUI</div>
+        <div>SEX</div>
+        <div>SÁB</div>
+      </div>
+
+      <div class="dias" id="diasCalendario"></div>
+
+      <div class="legenda">
+
+        <div class="legenda-item">
+          <span class="bolinha livre"></span>
+          Disponível
+        </div>
+
+        <div class="legenda-item">
+          <span class="bolinha ocupada"></span>
+          Dia reservado
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- DIAS ESCOLHIDOS E HORÁRIO DE CHEGADA -->
+    <div class="horarios-box" id="horariosBox">
+
+      <h3>Dias escolhidos</h3>
+
+      <div class="data-escolhida" id="diasEscolhidos"></div>
+
+      <button type="button" class="btn-limpar" id="btnLimpar">
+        Limpar dias
+      </button>
+
+      <div class="chegada-campo">
+
+        <label for="horaChegada">
+          Horário de chegada
+        </label>
+
+        <select id="horaChegada"></select>
+
+        <p class="chegada-dica">
+          O flutuante fica com você o dia todo.
+          Escolha só a hora em que você vai chegar.
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- QUANTIDADE -->
+    <div class="pessoas-box" id="pessoasBox">
+
+      <label for="pessoas">
+        Quantidade de pessoas
+      </label>
+
+      <input
+        type="number"
+        id="pessoas"
+        min="1"
+        max="50"
+        value="4"
+        required
+      >
+
+    </div>
+
+    <!-- BOTÃO -->
+    <button
+      type="button"
+      class="btn-confirmar"
+      id="btnConfirmar"
+    >
+      Confirmar reserva
+    </button>
+
+  </div>
+
+</div>
+
+<script type="module">
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+  import {
+    getFirestore,
+    collection,
+    doc,
+    writeBatch,
+    getDocs,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+  /* =========================
+     FIREBASE
+  ========================= */
+
+  const firebaseConfig = {
+
+    apiKey: "AIzaSyAV9cNfhpCZBZhbALJtLn_PV4aCZBTaWEA",
+
+    authDomain:
+      "arte-club-ebb51.firebaseapp.com",
+
+    projectId:
+      "arte-club-ebb51",
+
+    storageBucket:
+      "arte-club-ebb51.firebasestorage.app",
+
+    messagingSenderId:
+      "449870550765",
+
+    appId:
+      "1:449870550765:web:b1959f2fe96d0ba11f9ee4"
+
+  };
+
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth(app);
+
+  const db = getFirestore(app);
+
+
+  /* =========================
+     ELEMENTOS
+  ========================= */
+
+  const nomeUsuario =
+    document.getElementById("nomeUsuario");
+
+  const btnSair =
+    document.getElementById("btnSair");
+
+  const mesAno =
+    document.getElementById("mesAno");
+
+  const diasCalendario =
+    document.getElementById("diasCalendario");
+
+  const mesAnterior =
+    document.getElementById("mesAnterior");
+
+  const mesProximo =
+    document.getElementById("mesProximo");
+
+  const horariosBox =
+    document.getElementById("horariosBox");
+
+  const diasEscolhidos =
+    document.getElementById("diasEscolhidos");
+
+  const btnLimpar =
+    document.getElementById("btnLimpar");
+
+  const horaChegada =
+    document.getElementById("horaChegada");
+
+  const pessoasBox =
+    document.getElementById("pessoasBox");
+
+  const pessoas =
+    document.getElementById("pessoas");
+
+  const btnConfirmar =
+    document.getElementById("btnConfirmar");
+
+
+  /* =========================
+     CONFIGURAÇÕES
+     (pode ajustar aqui)
+  ========================= */
+
+  /* Primeira e última hora de chegada */
+
+  const HORA_PRIMEIRA_CHEGADA = 8;
+
+  const HORA_ULTIMA_CHEGADA = 18;
+
+
+  /* Máximo de dias em uma reserva */
+
+  const MAX_DIAS = 30;
+
+
+  let reservas = [];
+
+  /*
+    Mês exibido no calendário.
+    Sempre no dia 1, para não pular
+    de mês em dias 29, 30 ou 31.
+  */
+
+  const hojeInicial = new Date();
+
+  let dataAtual = new Date(
+    hojeInicial.getFullYear(),
+    hojeInicial.getMonth(),
+    1
+  );
+
+  /*
+    Dias escolhidos (AAAA-MM-DD).
+    Pode ser mais de um.
+  */
+
+  const diasSelecionados = new Set();
+
+  let salvando = false;
+
+
+  /* =========================
+     HORÁRIOS DE CHEGADA
+  ========================= */
+
+  function montarHorarios() {
+
+    horaChegada.innerHTML = "";
+
+
+    const vazio =
+      document.createElement("option");
+
+    vazio.value = "";
+
+    vazio.textContent =
+      "Escolha o horário";
+
+    horaChegada.appendChild(vazio);
+
+
+    for (
+      let minutos = HORA_PRIMEIRA_CHEGADA * 60;
+      minutos <= HORA_ULTIMA_CHEGADA * 60;
+      minutos += 30
+    ) {
+
+      const hora =
+        String(
+          Math.floor(minutos / 60)
+        ).padStart(2, "0");
+
+      const minuto =
+        String(
+          minutos % 60
+        ).padStart(2, "0");
+
+
+      const opcao =
+        document.createElement("option");
+
+      opcao.value =
+        `${hora}:${minuto}`;
+
+      opcao.textContent =
+        `${hora}:${minuto}`;
+
+      horaChegada.appendChild(opcao);
+
+    }
+
+  }
+
+
+  /* =========================
+     USUÁRIO
+     (as reservas só são lidas
+     depois que o login é
+     reconhecido)
+  ========================= */
+
+  onAuthStateChanged(auth, async (usuario) => {
+
+    /*
+      Não redireciona para o login
+      ao abrir a página.
+    */
+
+    if (usuario) {
+
+      nomeUsuario.textContent =
+        usuario.displayName ||
+        usuario.email ||
+        "Usuário";
+
+    } else {
+
+      nomeUsuario.textContent = "Usuário";
+
+    }
+
+
+    await carregarReservas();
+
+    removerDiasIndisponiveis();
+
+    mostrarCalendario();
+
+    atualizarResumo();
+
+  });
+
+
+  /* =========================
+     BOTÃO SAIR
+  ========================= */
+
+  btnSair.addEventListener("click", async () => {
+
+    try {
+
+      await signOut(auth);
+
+      /*
+        Depois de sair, vai para
+        a tela de login.
+      */
+
+      window.location.replace("index.html");
+
+    } catch (erro) {
+
+      console.error(erro);
+
+      alert("Erro ao sair da conta.");
+
+    }
+
+  });
+
+
+  /* =========================
+     CARREGAR RESERVAS
+  ========================= */
+
+  async function carregarReservas() {
+
+    try {
+
+      const snapshot =
+        await getDocs(
+          collection(db, "reservas")
+        );
+
+      const lista = [];
+
+      snapshot.forEach((documento) => {
+
+        const dados = documento.data();
+
+        if (dados.status !== "cancelada") {
+
+          lista.push(dados);
+
+        }
+
+      });
+
+      reservas = lista;
+
+    } catch (erro) {
+
+      /*
+        Se o Firestore bloquear a leitura,
+        o calendário continua funcionando
+        com o que já foi carregado.
+      */
+
+      console.error(
+        "Erro ao carregar reservas:",
+        erro
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     FORMATAR DATA
+  ========================= */
+
+  function formatarData(data) {
+
+    const ano =
+      data.getFullYear();
+
+    const mes =
+      String(
+        data.getMonth() + 1
+      ).padStart(2, "0");
+
+    const dia =
+      String(
+        data.getDate()
+      ).padStart(2, "0");
+
+    return `${ano}-${mes}-${dia}`;
+
+  }
+
+
+  /* =========================
+     DATA BR
+  ========================= */
+
+  function formatarDataBR(data) {
+
+    const partes =
+      data.split("-");
+
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+  }
+
+
+  /* =========================
+     DATA / HORÁRIO NO PASSADO
+  ========================= */
+
+  function dataPassou(data) {
+
+    /*
+      Formato AAAA-MM-DD permite
+      comparar como texto.
+    */
+
+    return data < formatarData(new Date());
+
+  }
+
+
+  function horarioPassou(
+    data,
+    horario
+  ) {
+
+    const agora = new Date();
+
+    if (data !== formatarData(agora)) {
+
+      return false;
+
+    }
+
+    const partes =
+      horario.split(":");
+
+    const minutosHorario =
+      Number(partes[0]) * 60 +
+      Number(partes[1]);
+
+    const minutosAgora =
+      agora.getHours() * 60 +
+      agora.getMinutes();
+
+    return minutosHorario <= minutosAgora;
+
+  }
+
+
+  /* =========================
+     DIA RESERVADO
+     (o flutuante é alugado
+     o dia todo)
+  ========================= */
+
+  function diaTemReserva(data) {
+
+    return reservas.some((reserva) => {
+
+      return (
+        reserva.data_reserva === data &&
+        reserva.status !== "cancelada"
+      );
+
+    });
+
+  }
+
+
+  /* =========================
+     REMOVER DIAS QUE NÃO
+     PODEM MAIS SER RESERVADOS
+  ========================= */
+
+  function removerDiasIndisponiveis() {
+
+    const removidos = [];
+
+    Array
+      .from(diasSelecionados)
+      .forEach((dia) => {
+
+        if (
+          dataPassou(dia) ||
+          diaTemReserva(dia)
+        ) {
+
+          diasSelecionados.delete(dia);
+
+          removidos.push(dia);
+
+        }
+
+      });
+
+    return removidos.sort();
+
+  }
+
+
+  /* =========================
+     MOSTRAR CALENDÁRIO
+  ========================= */
+
+  function mostrarCalendario() {
+
+    diasCalendario.innerHTML = "";
+
+    const ano =
+      dataAtual.getFullYear();
+
+    const mes =
+      dataAtual.getMonth();
+
+
+    const nomesMeses = [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro"
+    ];
+
+
+    mesAno.textContent =
+      `${nomesMeses[mes]} ${ano}`;
+
+
+    const primeiroDia =
+      new Date(
+        ano,
+        mes,
+        1
+      ).getDay();
+
+
+    const ultimoDia =
+      new Date(
+        ano,
+        mes + 1,
+        0
+      ).getDate();
+
+
+    /*
+      Espaços antes do primeiro dia
+    */
+
+    for (
+      let i = 0;
+      i < primeiroDia;
+      i++
+    ) {
+
+      const vazio =
+        document.createElement("div");
+
+      vazio.className =
+        "dia vazio";
+
+      diasCalendario.appendChild(vazio);
+
+    }
+
+
+    /*
+      Dias do mês
+    */
+
+    const hoje =
+      new Date();
+
+
+    for (
+      let dia = 1;
+      dia <= ultimoDia;
+      dia++
+    ) {
+
+      const botao =
+        document.createElement("button");
+
+      botao.type = "button";
+
+      botao.className = "dia";
+
+      botao.textContent = dia;
+
+
+      const data =
+        new Date(
+          ano,
+          mes,
+          dia
+        );
+
+
+      const dataFormatada =
+        formatarData(data);
+
+
+      /*
+        Dia atual
+      */
+
+      if (
+        dia === hoje.getDate() &&
+        mes === hoje.getMonth() &&
+        ano === hoje.getFullYear()
+      ) {
+
+        botao.classList.add("hoje");
+
+      }
+
+
+      if (dataPassou(dataFormatada)) {
+
+        /*
+          Dias que já passaram
+          não podem ser escolhidos.
+        */
+
+        botao.classList.add("passado");
+
+        botao.disabled = true;
+
+      } else if (
+        diaTemReserva(dataFormatada)
+      ) {
+
+        /*
+          Dia já reservado por
+          alguém: bloqueado.
+        */
+
+        botao.classList.add(
+          "ocupado-dia"
+        );
+
+        botao.disabled = true;
+
+        botao.title =
+          "Dia reservado";
+
+      } else {
+
+        if (
+          diasSelecionados.has(
+            dataFormatada
+          )
+        ) {
+
+          botao.classList.add(
+            "selecionado"
+          );
+
+        }
+
+
+        botao.addEventListener(
+          "click",
+          () => {
+
+            alternarDia(
+              dataFormatada,
+              botao
+            );
+
+          }
+        );
+
+      }
+
+
+      diasCalendario.appendChild(
+        botao
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     ESCOLHER / TIRAR UM DIA
+  ========================= */
+
+  function alternarDia(
+    data,
+    botao
+  ) {
+
+    if (diasSelecionados.has(data)) {
+
+      diasSelecionados.delete(data);
+
+      botao.classList.remove(
+        "selecionado"
+      );
+
+    } else {
+
+      if (
+        diasSelecionados.size >=
+        MAX_DIAS
+      ) {
+
+        alert(
+          `Você pode reservar até ${MAX_DIAS} dias de uma vez.`
+        );
+
+        return;
+
+      }
+
+
+      diasSelecionados.add(data);
+
+      botao.classList.add(
+        "selecionado"
+      );
+
+    }
+
+
+    atualizarResumo();
+
+  }
+
+
+  /* =========================
+     RESUMO DOS DIAS ESCOLHIDOS
+  ========================= */
+
+  function atualizarResumo() {
+
+    const dias =
+      Array
+        .from(diasSelecionados)
+        .sort();
+
+
+    if (dias.length === 0) {
+
+      horariosBox.style.display =
+        "none";
+
+      pessoasBox.style.display =
+        "none";
+
+      btnConfirmar.style.display =
+        "none";
+
+      return;
+
+    }
+
+
+    horariosBox.style.display =
+      "block";
+
+    pessoasBox.style.display =
+      "block";
+
+    btnConfirmar.style.display =
+      "block";
+
+
+    diasEscolhidos.textContent =
+      `${dias.length} ` +
+      `${dias.length === 1 ? "dia" : "dias"}: ` +
+      dias
+        .map(formatarDataBR)
+        .join(", ");
+
+
+    if (!salvando) {
+
+      btnConfirmar.textContent =
+        dias.length === 1
+          ? "Confirmar reserva"
+          : `Confirmar reserva (${dias.length} dias)`;
+
+    }
+
+  }
+
+
+  /* =========================
+     LIMPAR DIAS
+  ========================= */
+
+  btnLimpar.addEventListener(
+    "click",
+    () => {
+
+      diasSelecionados.clear();
+
+      mostrarCalendario();
+
+      atualizarResumo();
+
+    }
+  );
+
+
+  /* =========================
+     MUDAR MÊS
+  ========================= */
+
+  mesAnterior.addEventListener(
+    "click",
+    () => {
+
+      dataAtual = new Date(
+        dataAtual.getFullYear(),
+        dataAtual.getMonth() - 1,
+        1
+      );
+
+      mostrarCalendario();
+
+    }
+  );
+
+
+  mesProximo.addEventListener(
+    "click",
+    () => {
+
+      dataAtual = new Date(
+        dataAtual.getFullYear(),
+        dataAtual.getMonth() + 1,
+        1
+      );
+
+      mostrarCalendario();
+
+    }
+  );
+
+
+  /* =========================
+     CONFIRMAR RESERVA
+  ========================= */
+
+  btnConfirmar.addEventListener(
+    "click",
+    async () => {
+
+      if (salvando) {
+
+        return;
+
+      }
+
+
+      const usuario =
+        auth.currentUser;
+
+
+      /*
+        NÃO redireciona para login.
+      */
+
+      if (!usuario) {
+
+        alert(
+          "Você precisa estar conectado para confirmar a reserva."
+        );
+
+        return;
+
+      }
+
+
+      if (diasSelecionados.size === 0) {
+
+        alert(
+          "Escolha pelo menos um dia."
+        );
+
+        return;
+
+      }
+
+
+      const horario =
+        horaChegada.value;
+
+
+      if (!horario) {
+
+        alert(
+          "Escolha o horário de chegada."
+        );
+
+        return;
+
+      }
+
+
+      const hoje =
+        formatarData(new Date());
+
+
+      if (
+        diasSelecionados.has(hoje) &&
+        horarioPassou(hoje, horario)
+      ) {
+
+        alert(
+          "Esse horário de hoje já passou. Escolha um horário mais tarde ou outro dia."
+        );
+
+        return;
+
+      }
+
+
+      const quantidade =
+        Number(
+          pessoas.value
+        );
+
+
+      if (
+        !Number.isInteger(quantidade) ||
+        quantidade < 1 ||
+        quantidade > 50
+      ) {
+
+        alert(
+          "A quantidade deve ser um número inteiro entre 1 e 50."
+        );
+
+        return;
+
+      }
+
+
+      salvando = true;
+
+      btnConfirmar.disabled = true;
+
+      btnConfirmar.textContent =
+        "Reservando...";
+
+
+      let salvou = false;
+
+
+      try {
+
+        /*
+          Confere de novo no banco,
+          caso outra pessoa tenha
+          reservado nesse meio tempo.
+        */
+
+        await carregarReservas();
+
+
+        const removidos =
+          removerDiasIndisponiveis();
+
+
+        if (removidos.length > 0) {
+
+          mostrarCalendario();
+
+          alert(
+            "Estes dias não estão mais disponíveis e saíram da sua seleção:\n\n" +
+            removidos
+              .map(formatarDataBR)
+              .join(", ")
+          );
+
+          return;
+
+        }
+
+
+        /*
+          Uma reserva para cada dia,
+          todas salvas juntas: ou
+          entram todas, ou nenhuma.
+        */
+
+        const dias =
+          Array
+            .from(diasSelecionados)
+            .sort();
+
+
+        const lote =
+          writeBatch(db);
+
+
+        dias.forEach((dia) => {
+
+          lote.set(
+
+            doc(
+              collection(
+                db,
+                "reservas"
+              )
+            ),
+
+            {
+
+              usuario_id:
+                usuario.uid,
+
+              nome_usuario:
+                usuario.displayName ||
+                usuario.email ||
+                "",
+
+              email_usuario:
+                usuario.email || "",
+
+              data_reserva:
+                dia,
+
+              horario:
+                horario,
+
+              quantidade_pessoas:
+                quantidade,
+
+              status:
+                "pendente",
+
+              executor_id:
+                null,
+
+              criado_em:
+                serverTimestamp()
+
+            }
+
+          );
+
+        });
+
+
+        await lote.commit();
+
+
+        salvou = true;
+
+
+        alert(
+          dias.length === 1
+            ? "Reserva realizada com sucesso!"
+            : `Reserva realizada com sucesso! (${dias.length} dias)`
+        );
+
+
+        window.location.href =
+          "minhas-reservas.html";
+
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao salvar reserva:",
+          erro
+        );
+
+        alert(
+          "Não foi possível realizar a reserva. Tente novamente."
+        );
+
+      } finally {
+
+        if (!salvou) {
+
+          salvando = false;
+
+          btnConfirmar.disabled = false;
+
+          atualizarResumo();
+
+        }
+
+      }
+
+    }
+  );
+
+
+  /* =========================
+     INICIAR
+  ========================= */
+
+  /*
+    Mostra o calendário logo de
+    cara; ele é atualizado quando
+    as reservas terminam de carregar.
+  */
+
+  montarHorarios();
+
+  mostrarCalendario();
+
+</script>
+
+</body>
+</html>

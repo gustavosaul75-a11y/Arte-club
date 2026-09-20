@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Criar conta - Arte Club</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="marca">ARTE<span>CLUB</span></div>
+
+<div class="card">
+
+  <!-- LOGO -->
+  <svg
+    viewBox="0 0 200 200"
+    width="70"
+    height="70"
+    style="display:block; margin:0 auto 20px;">
+
+    <circle
+      cx="100"
+      cy="100"
+      r="94"
+      fill="#0d0d0c"
+      stroke="#ff6b1a"
+      stroke-width="4"/>
+
+    <circle
+      cx="100"
+      cy="100"
+      r="82"
+      fill="none"
+      stroke="#ff6b1a"
+      stroke-width="1.5"
+      opacity="0.5"/>
+
+    <g
+      stroke="#ff6b1a"
+      stroke-width="6"
+      stroke-linecap="round">
+
+      <line x1="100" y1="34" x2="100" y2="166"/>
+      <line x1="34" y1="100" x2="166" y2="100"/>
+      <line x1="53" y1="53" x2="147" y2="147"/>
+      <line x1="147" y1="53" x2="53" y2="147"/>
+
+    </g>
+
+    <circle
+      cx="100"
+      cy="100"
+      r="46"
+      fill="#0d0d0c"
+      stroke="#ff6b1a"
+      stroke-width="5"/>
+
+    <g fill="#ff6b1a">
+
+      <circle cx="100" cy="34" r="6"/>
+      <circle cx="100" cy="166" r="6"/>
+      <circle cx="34" cy="100" r="6"/>
+      <circle cx="166" cy="100" r="6"/>
+
+      <circle cx="53" cy="53" r="6"/>
+      <circle cx="147" cy="147" r="6"/>
+      <circle cx="147" cy="53" r="6"/>
+      <circle cx="53" cy="147" r="6"/>
+
+    </g>
+
+    <path
+      d="M 66 106 Q 78 92, 90 106 T 114 106 T 138 106"
+      fill="none"
+      stroke="#f2ede4"
+      stroke-width="5"
+      stroke-linecap="round"/>
+
+    <circle
+      cx="100"
+      cy="100"
+      r="46"
+      fill="none"
+      stroke="#ff6b1a"
+      stroke-width="2"
+      opacity="0.4"/>
+
+  </svg>
+
+
+  <h1>Criar conta</h1>
+
+  <p class="sub">
+    Cadastre-se para reservar seu passeio no flutuante.
+  </p>
+
+
+  <!-- FORMULÁRIO -->
+
+  <form id="cadastroForm">
+
+    <div class="campo">
+
+      <label for="nome">
+        Nome completo
+      </label>
+
+      <input
+        type="text"
+        id="nome"
+        placeholder="Seu nome"
+        required>
+
+    </div>
+
+
+    <div class="campo">
+
+      <label for="email">
+        E-mail
+      </label>
+
+      <input
+        type="email"
+        id="email"
+        placeholder="voce@email.com"
+        required>
+
+    </div>
+
+
+    <div class="campo">
+
+      <label for="telefone">
+        Telefone
+      </label>
+
+      <input
+        type="tel"
+        id="telefone"
+        placeholder="(00) 00000-0000">
+
+    </div>
+
+
+    <div class="campo">
+
+      <label for="senha">
+        Senha
+      </label>
+
+      <input
+        type="password"
+        id="senha"
+        placeholder="••••••••"
+        minlength="6"
+        required>
+
+    </div>
+
+
+    <button type="submit">
+      Criar conta
+    </button>
+
+  </form>
+
+
+  <p class="rodape">
+
+    Já tem conta?
+
+    <a href="index.html">
+      Entrar
+    </a>
+
+  </p>
+
+</div>
+
+
+<!-- ========================================= -->
+<!-- FIREBASE -->
+<!-- ========================================= -->
+
+<script type="module">
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    updateProfile
+  }
+    from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+
+  import {
+    getFirestore,
+    doc,
+    setDoc
+  }
+    from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+  // =========================================
+  // CONFIGURAÇÃO DO FIREBASE
+  // =========================================
+
+  const firebaseConfig = {
+
+    apiKey:
+      "AIzaSyAV9cNfhpCZBZhbALJtLn_PV4aCZBTaWEA",
+
+    authDomain:
+      "arte-club-ebb51.firebaseapp.com",
+
+    projectId:
+      "arte-club-ebb51",
+
+    storageBucket:
+      "arte-club-ebb51.firebasestorage.app",
+
+    messagingSenderId:
+      "449870550765",
+
+    appId:
+      "1:449870550765:web:b1959f2fe96d0ba11f9ee4"
+
+  };
+
+
+  // =========================================
+  // INICIALIZA FIREBASE
+  // =========================================
+
+  const app =
+    initializeApp(firebaseConfig);
+
+
+  const auth =
+    getAuth(app);
+
+
+  const db =
+    getFirestore(app);
+
+
+  // =========================================
+  // FORMULÁRIO
+  // =========================================
+
+  const formulario =
+    document.getElementById("cadastroForm");
+
+
+  formulario.addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      // =======================================
+      // PEGAR DADOS DO FORMULÁRIO
+      // =======================================
+
+      const nome =
+        document
+          .getElementById("nome")
+          .value
+          .trim();
+
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
+
+
+      const telefone =
+        document
+          .getElementById("telefone")
+          .value
+          .trim();
+
+
+      const senha =
+        document
+          .getElementById("senha")
+          .value;
+
+
+      // =======================================
+      // VERIFICAR SENHA
+      // =======================================
+
+      if (senha.length < 6) {
+
+        alert(
+          "A senha precisa ter pelo menos 6 caracteres."
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        // =====================================
+        // CRIAR CONTA NO FIREBASE AUTH
+        // =====================================
+
+        const resultado =
+          await createUserWithEmailAndPassword(
+            auth,
+            email,
+            senha
+          );
+
+
+        const usuario =
+          resultado.user;
+
+
+        // =====================================
+        // SALVAR NOME NO AUTH
+        // =====================================
+
+        await updateProfile(
+          usuario,
+          {
+            displayName: nome
+          }
+        );
+
+
+        // =====================================
+        // SALVAR USUÁRIO NO FIRESTORE
+        // =====================================
+
+        await setDoc(
+          doc(
+            db,
+            "usuarios",
+            usuario.uid
+          ),
+          {
+
+            id: usuario.uid,
+
+            nome: nome,
+
+            email: email,
+
+            telefone: telefone,
+
+            tipo_usuario: "usuario",
+
+            criado_em: new Date()
+
+          }
+        );
+
+
+        // =====================================
+        // SUCESSO
+        // =====================================
+
+        alert(
+          "Conta criada com sucesso!"
+        );
+
+
+        // Ir para o login
+
+        window.location.href =
+          "index.html";
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "Erro completo:",
+          error
+        );
+
+
+        // =====================================
+        // EMAIL JÁ CADASTRADO
+        // =====================================
+
+        if (
+          error.code ===
+          "auth/email-already-in-use"
+        ) {
+
+          alert(
+            "Este e-mail já está cadastrado."
+          );
+
+        }
+
+
+        // =====================================
+        // SENHA FRACA
+        // =====================================
+
+        else if (
+          error.code ===
+          "auth/weak-password"
+        ) {
+
+          alert(
+            "A senha precisa ter pelo menos 6 caracteres."
+          );
+
+        }
+
+
+        // =====================================
+        // EMAIL INVÁLIDO
+        // =====================================
+
+        else if (
+          error.code ===
+          "auth/invalid-email"
+        ) {
+
+          alert(
+            "Digite um e-mail válido."
+          );
+
+        }
+
+
+        // =====================================
+        // PERMISSÃO DO FIRESTORE
+        // =====================================
+
+        else if (
+          error.code ===
+          "permission-denied"
+        ) {
+
+          alert(
+            "A conta foi criada, mas o Firestore não permitiu salvar os dados."
+          );
+
+        }
+
+
+        // =====================================
+        // OUTRO ERRO
+        // =====================================
+
+        else {
+
+          alert(
+            "Erro ao criar conta:\n\n" +
+            error.message
+          );
+
+        }
+
+      }
+
+    }
+  );
+
+</script>
+
+</body>
+
+</html>

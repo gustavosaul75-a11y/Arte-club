@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Minhas reservas — Arte Club</title>
+
+  <link rel="stylesheet" href="minhas-reservas.css">
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <a href="minhas-reservas.html" class="marca">
+    ARTE<span>CLUB</span>
+  </a>
+
+  <div class="usuario-area">
+
+    <span class="usuario-nome" id="nomeUsuario">
+      Carregando...
+    </span>
+
+    <span class="badge badge-usuario">
+      Usuário
+    </span>
+
+    <a href="#" class="btn-sair" id="btnSair">
+      Sair
+    </a>
+
+  </div>
+
+</header>
+
+
+<nav class="tabs-nav">
+
+  <a href="agendamento.html" class="tab">
+    Agendar
+  </a>
+
+  <a href="minhas-reservas.html" class="tab ativa">
+    Minhas Reservas
+  </a>
+
+  <a href="feed.html" class="tab">
+    Momentos
+  </a>
+
+</nav>
+
+
+<div class="conteudo">
+
+  <h1>Minhas reservas</h1>
+
+  <p class="sub">
+    Acompanhe o status dos seus passeios no flutuante.
+  </p>
+
+  <div id="lista"></div>
+
+</div>
+
+
+<!-- FIREBASE -->
+<script type="module">
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+  import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    doc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+  // CONFIGURAÇÃO DO FIREBASE
+
+  const firebaseConfig = {
+
+    apiKey: "AIzaSyAV9cNfhpCZBZhbALJtLn_PV4aCZBTaWEA",
+
+    authDomain: "arte-club-ebb51.firebaseapp.com",
+
+    projectId: "arte-club-ebb51",
+
+    storageBucket: "arte-club-ebb51.firebasestorage.app",
+
+    messagingSenderId: "449870550765",
+
+    appId: "1:449870550765:web:b1959f2fe96d0ba11f9ee4"
+
+  };
+
+
+  // INICIAR FIREBASE
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth(app);
+
+  const db = getFirestore(app);
+
+
+  // ELEMENTOS
+
+  const lista = document.getElementById("lista");
+
+  const nomeUsuario =
+    document.getElementById("nomeUsuario");
+
+  const btnSair =
+    document.getElementById("btnSair");
+
+
+  // STATUS
+
+  const nomesStatus = {
+
+    confirmada: "Confirmada",
+
+    pendente: "Pendente",
+
+    concluida: "Concluída",
+
+    cancelada: "Cancelada"
+
+  };
+
+
+  // USUÁRIO LOGADO
+
+  onAuthStateChanged(auth, async (usuario) => {
+
+    if (!usuario) {
+
+      alert("Você precisa estar logado.");
+
+      window.location.href = "index.html";
+
+      return;
+
+    }
+
+
+    // Mostrar nome
+
+    nomeUsuario.textContent =
+      usuario.displayName || usuario.email;
+
+
+    // Buscar reservas
+
+    await carregarReservas(usuario.uid);
+
+  });
+
+
+  // CARREGAR RESERVAS
+
+  async function carregarReservas(uid) {
+
+    lista.innerHTML =
+      '<div class="vazio">Carregando reservas...</div>';
+
+
+    try {
+
+      const reservasRef =
+        collection(db, "reservas");
+
+
+      const consulta =
+        query(
+          reservasRef,
+          where("usuario_id", "==", uid)
+        );
+
+
+      const resultado =
+        await getDocs(consulta);
+
+
+      lista.innerHTML = "";
+
+
+      // Nenhuma reserva
+
+      if (resultado.empty) {
+
+        lista.innerHTML =
+          '<div class="vazio">Você ainda não tem reservas.</div>';
+
+        return;
+
+      }
+
+
+      // Transformar documentos em lista
+
+      const reservas = [];
+
+
+      resultado.forEach((documento) => {
+
+        reservas.push({
+
+          id: documento.id,
+
+          ...documento.data()
+
+        });
+
+      });
+
+
+      // Ordenar pela data
+
+      reservas.sort((a, b) => {
+
+        const dataA =
+          `${a.data_reserva} ${a.horario}`;
+
+        const dataB =
+          `${b.data_reserva} ${b.horario}`;
+
+        return dataA.localeCompare(dataB);
+
+      });
+
+
+      // Mostrar reservas
+
+      reservas.forEach((r) => {
+
+        const div =
+          document.createElement("div");
+
+
+        div.className = "reserva";
+
+
+        // Converter data
+
+        let dataFormatada =
+          r.data_reserva;
+
+
+        if (r.data_reserva) {
+
+          const partes =
+            r.data_reserva.split("-");
+
+
+          if (partes.length === 3) {
+
+            dataFormatada =
+              `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+          }
+
+        }
+
+
+        // Nome do status
+
+        const status =
+          r.status || "pendente";
+
+
+        const nomeStatus =
+          nomesStatus[status] || status;
+
+
+        // Botão cancelar
+
+        let botaoCancelar = "";
+
+
+        if (
+          status === "pendente" ||
+          status === "confirmada"
+        ) {
+
+          botaoCancelar = `
+            <button
+              class="cancelar"
+              data-id="${r.id}">
+              Cancelar
+            </button>
+          `;
+
+        }
+
+
+        div.innerHTML = `
+
+          <div class="info">
+
+            <h3>
+              ${dataFormatada} às ${r.horario}
+            </h3>
+
+            <span>
+              ${r.quantidade_pessoas} pessoas
+            </span>
+
+          </div>
+
+
+          <div class="direita">
+
+            <span class="status ${status}">
+              ${nomeStatus}
+            </span>
+
+            ${botaoCancelar}
+
+          </div>
+
+        `;
+
+
+        lista.appendChild(div);
+
+
+        // Evento do botão cancelar
+
+        const botao =
+          div.querySelector(".cancelar");
+
+
+        if (botao) {
+
+          botao.addEventListener(
+            "click",
+            () => cancelarReserva(r.id)
+          );
+
+        }
+
+      });
+
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao carregar reservas:",
+        erro
+      );
+
+
+      lista.innerHTML = `
+        <div class="vazio">
+          Não foi possível carregar suas reservas.
+        </div>
+      `;
+
+    }
+
+  }
+
+
+  // CANCELAR RESERVA
+
+  async function cancelarReserva(id) {
+
+    const confirmar =
+      confirm(
+        "Tem certeza que deseja cancelar esta reserva?"
+      );
+
+
+    if (!confirmar) {
+
+      return;
+
+    }
+
+
+    try {
+
+      const reservaRef =
+        doc(db, "reservas", id);
+
+
+      await updateDoc(
+        reservaRef,
+        {
+          status: "cancelada"
+        }
+      );
+
+
+      alert("Reserva cancelada com sucesso!");
+
+
+      // Recarregar lista
+
+      const usuario =
+        auth.currentUser;
+
+
+      if (usuario) {
+
+        await carregarReservas(
+          usuario.uid
+        );
+
+      }
+
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao cancelar reserva:",
+        erro
+      );
+
+
+      alert(
+        "Não foi possível cancelar a reserva."
+      );
+
+    }
+
+  }
+
+
+  // SAIR
+
+  btnSair.addEventListener(
+    "click",
+    async (event) => {
+
+      event.preventDefault();
+
+
+      try {
+
+        await signOut(auth);
+
+        window.location.href =
+          "index.html";
+
+      } catch (erro) {
+
+        console.error(erro);
+
+        alert(
+          "Erro ao sair da conta."
+        );
+
+      }
+
+    }
+  );
+
+</script>
+
+</body>
+</html>

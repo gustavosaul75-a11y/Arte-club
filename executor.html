@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Painel do Executor — Arte Club</title>
+
+<link rel="stylesheet"
+      href="executor.css">
+
+</head>
+
+
+<body>
+
+
+<header>
+
+  <a href="executor.html"
+     class="marca">
+
+    ARTE<span>CLUB</span>
+
+    <span class="cargo">
+      Painel do Executor
+    </span>
+
+  </a>
+
+
+  <button
+    id="btnSair"
+    class="sair">
+
+    Sair
+
+  </button>
+
+</header>
+
+
+
+<div class="conteudo">
+
+  <h1>
+    Suas execuções
+  </h1>
+
+
+  <p class="sub">
+    Pegue uma reserva disponível e marque como concluída após o passeio.
+  </p>
+
+
+  <div
+    class="contador"
+    id="contador">
+
+  </div>
+
+
+  <div id="lista">
+
+    <p>
+      Carregando reservas...
+    </p>
+
+  </div>
+
+</div>
+
+
+
+<script type="module">
+
+
+/* =====================================
+   FIREBASE
+===================================== */
+
+import {
+  initializeApp
+} from
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  updateDoc,
+  runTransaction
+} from
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+
+/* =====================================
+   CONFIGURAÇÃO
+===================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyAV9cNfhpCZBZhbALJtLn_PV4aCZBTaWEA",
+
+  authDomain:
+    "arte-club-ebb51.firebaseapp.com",
+
+  projectId:
+    "arte-club-ebb51",
+
+  storageBucket:
+    "arte-club-ebb51.firebasestorage.app",
+
+  messagingSenderId:
+    "449870550765",
+
+  appId:
+    "1:449870550765:web:b1959f2fe96d0ba11f9ee4"
+
+};
+
+
+
+const app =
+  initializeApp(firebaseConfig);
+
+
+const auth =
+  getAuth(app);
+
+
+const db =
+  getFirestore(app);
+
+
+
+/* =====================================
+   ELEMENTOS
+===================================== */
+
+const lista =
+  document.getElementById("lista");
+
+
+const contador =
+  document.getElementById("contador");
+
+
+const btnSair =
+  document.getElementById("btnSair");
+
+
+
+/* =====================================
+   USUÁRIO LOGADO
+===================================== */
+
+let executorAtual = null;
+
+let nomeExecutor = "";
+
+
+
+onAuthStateChanged(
+  auth,
+  async (usuario) => {
+
+    if (!usuario) {
+
+      window.location.href =
+        "index.html";
+
+      return;
+
+    }
+
+
+    executorAtual = usuario;
+
+
+    /*
+      Confere se o usuário
+      realmente é executor.
+    */
+
+    try {
+
+      const cadastro =
+        await getDoc(
+          doc(
+            db,
+            "usuarios",
+            usuario.uid
+          )
+        );
+
+
+      const dados =
+        cadastro.exists()
+          ? cadastro.data()
+          : {};
+
+
+      nomeExecutor =
+        dados.nome ||
+        usuario.displayName ||
+        usuario.email ||
+        "";
+
+
+      const tipo =
+        dados.tipo_usuario ||
+        "usuario";
+
+
+      if (
+        tipo !== "executor" &&
+        tipo !== "admin"
+      ) {
+
+        alert(
+          "Você não tem permissão para acessar o painel do executor."
+        );
+
+        window.location.href =
+          "index.html";
+
+        return;
+
+      }
+
+    } catch (erro) {
+
+      console.error(erro);
+
+    }
+
+
+    await carregarReservas();
+
+  }
+);
+
+
+
+/* =====================================
+   BOTÃO SAIR
+===================================== */
+
+btnSair.addEventListener(
+  "click",
+  async () => {
+
+    await signOut(auth);
+
+    window.location.href =
+      "index.html";
+
+  }
+);
+
+
+
+/* =====================================
+   BUSCAR RESERVAS
+===================================== */
+
+async function carregarReservas() {
+
+  try {
+
+    lista.innerHTML =
+      "<p>Carregando reservas...</p>";
+
+
+    /*
+      Agora buscamos TODAS as reservas.
+      A separação é feita aqui embaixo:
+
+      - disponiveis: pendentes e ainda
+        sem nenhum executor;
+
+      - minhas: as que já foram
+        pegas por este executor.
+    */
+
+    const resultado =
+      await getDocs(
+        collection(
+          db,
+          "reservas"
+        )
+      );
+
+
+    const todas = [];
+
+
+    resultado.forEach(
+      (documento) => {
+
+        todas.push({
+
+          id:
+            documento.id,
+
+          ...documento.data()
+
+        });
+
+      }
+    );
+
+
+    const disponiveis =
+      todas.filter(
+        (e) =>
+          !e.executor_id &&
+          (
+            e.status === "pendente" ||
+            e.status === "confirmada"
+          )
+      );
+
+
+    const minhas =
+      todas.filter(
+        (e) =>
+          e.executor_id ===
+          executorAtual.uid
+      );
+
+
+    ordenar(disponiveis);
+
+    ordenar(minhas);
+
+
+    renderizar(
+      disponiveis,
+      minhas
+    );
+
+
+  } catch (erro) {
+
+    console.error(erro);
+
+
+    lista.innerHTML = `
+
+      <div class="vazio">
+
+        Erro ao carregar
+        as reservas.
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+
+/* =====================================
+   ORDENAR POR DATA E HORÁRIO
+===================================== */
+
+function ordenar(itens) {
+
+  itens.sort(
+    (a, b) => {
+
+      const chaveA =
+        (a.data_reserva || "") +
+        (a.horario || "");
+
+
+      const chaveB =
+        (b.data_reserva || "") +
+        (b.horario || "");
+
+
+      return chaveA.localeCompare(chaveB);
+
+    }
+  );
+
+}
+
+
+
+/* =====================================
+   RENDERIZAR
+===================================== */
+
+function renderizar(
+  disponiveis,
+  minhas
+) {
+
+
+  const pendentes =
+    minhas.filter(
+      (e) =>
+        e.status === "confirmada"
+    ).length;
+
+
+  const feitas =
+    minhas.filter(
+      (e) =>
+        e.status === "concluida"
+    ).length;
+
+
+
+  /* CONTADOR */
+
+  contador.innerHTML = `
+
+    <div>
+
+      <div class="num">
+        ${disponiveis.length}
+      </div>
+
+      <div class="rotulo">
+        Disponíveis
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <div class="num">
+        ${pendentes}
+      </div>
+
+      <div class="rotulo">
+        A executar
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <div class="num">
+        ${feitas}
+      </div>
+
+      <div class="rotulo">
+        Concluídas
+      </div>
+
+    </div>
+
+  `;
+
+
+
+  lista.innerHTML = "";
+
+
+
+  /* ---------- DISPONÍVEIS ---------- */
+
+  const tituloDisponiveis =
+    document.createElement("h2");
+
+
+  tituloDisponiveis.textContent =
+    "Reservas disponíveis";
+
+
+  lista.appendChild(
+    tituloDisponiveis
+  );
+
+
+  if (disponiveis.length === 0) {
+
+    const vazio =
+      document.createElement("div");
+
+
+    vazio.className = "vazio";
+
+
+    vazio.textContent =
+      "Nenhuma reserva disponível no momento.";
+
+
+    lista.appendChild(vazio);
+
+  } else {
+
+    disponiveis.forEach(
+      (e) => {
+
+        lista.appendChild(
+          criarCartao(e, true)
+        );
+
+      }
+    );
+
+  }
+
+
+
+  /* ---------- MINHAS ---------- */
+
+  const tituloMinhas =
+    document.createElement("h2");
+
+
+  tituloMinhas.textContent =
+    "Minhas execuções";
+
+
+  lista.appendChild(
+    tituloMinhas
+  );
+
+
+  if (minhas.length === 0) {
+
+    const vazio =
+      document.createElement("div");
+
+
+    vazio.className = "vazio";
+
+
+    vazio.textContent =
+      "Você ainda não pegou nenhuma reserva.";
+
+
+    lista.appendChild(vazio);
+
+  } else {
+
+    minhas.forEach(
+      (e) => {
+
+        lista.appendChild(
+          criarCartao(e, false)
+        );
+
+      }
+    );
+
+  }
+
+}
+
+
+
+/* =====================================
+   CARTÃO DA RESERVA
+===================================== */
+
+function criarCartao(
+  e,
+  disponivel
+) {
+
+  const div =
+    document.createElement("div");
+
+
+  div.className =
+    "tarefa" +
+    (
+      e.status === "concluida"
+        ? " concluida"
+        : ""
+    );
+
+
+
+  let statusTexto =
+    "Confirmada";
+
+
+  if (
+    e.status ===
+    "concluida"
+  ) {
+
+    statusTexto =
+      "Concluída";
+
+  }
+
+
+  if (
+    e.status ===
+    "pendente"
+  ) {
+
+    statusTexto =
+      "Pendente";
+
+  }
+
+
+  if (
+    e.status ===
+    "cancelada"
+  ) {
+
+    statusTexto =
+      "Cancelada";
+
+  }
+
+
+
+  let botao = "";
+
+
+  if (disponivel) {
+
+    botao = `
+
+      <button
+        class="concluir"
+        data-acao="pegar"
+        data-id="${e.id}">
+
+        Pegar reserva
+
+      </button>
+
+    `;
+
+  } else if (
+    e.status === "confirmada"
+  ) {
+
+    botao = `
+
+      <button
+        class="concluir"
+        data-acao="concluir"
+        data-id="${e.id}">
+
+        Marcar concluído
+
+      </button>
+
+    `;
+
+  }
+
+
+
+  div.innerHTML = `
+
+    <div class="info">
+
+      <h3>
+
+        ${escapeHTML(
+          e.nome_usuario || "Cliente"
+        )}
+
+      </h3>
+
+
+      <span>
+
+        ${formatarData(e.data_reserva)}
+
+        às
+
+        ${escapeHTML(e.horario || "--:--")}
+
+        ·
+
+        ${e.quantidade_pessoas || 0}
+
+        pessoas
+
+      </span>
+
+    </div>
+
+
+
+    <div class="direita">
+
+      <span
+        class="status ${e.status}">
+
+        ${statusTexto}
+
+      </span>
+
+
+      ${botao}
+
+    </div>
+
+  `;
+
+
+  return div;
+
+}
+
+
+
+/* =====================================
+   CLIQUE NOS BOTÕES
+===================================== */
+
+lista.addEventListener(
+  "click",
+  async (evento) => {
+
+    const botao =
+      evento.target.closest(
+        "button[data-acao]"
+      );
+
+
+    if (!botao) {
+
+      return;
+
+    }
+
+
+    const id =
+      botao.dataset.id;
+
+
+    if (
+      botao.dataset.acao === "pegar"
+    ) {
+
+      await pegarReserva(id, botao);
+
+    } else {
+
+      await concluirReserva(id, botao);
+
+    }
+
+  }
+);
+
+
+
+/* =====================================
+   PEGAR RESERVA
+===================================== */
+
+async function pegarReserva(
+  id,
+  botao
+) {
+
+  const confirmar =
+    confirm(
+      "Deseja pegar esta reserva para você?"
+    );
+
+
+  if (!confirmar) {
+
+    return;
+
+  }
+
+
+  botao.disabled = true;
+
+
+  try {
+
+    /*
+      A transação evita que dois
+      executores peguem a mesma
+      reserva ao mesmo tempo.
+    */
+
+    await runTransaction(
+      db,
+      async (transacao) => {
+
+        const referencia =
+          doc(
+            db,
+            "reservas",
+            id
+          );
+
+
+        const atual =
+          await transacao.get(
+            referencia
+          );
+
+
+        if (!atual.exists()) {
+
+          throw new Error(
+            "Esta reserva não existe mais."
+          );
+
+        }
+
+
+        const dados =
+          atual.data();
+
+
+        if (dados.executor_id) {
+
+          throw new Error(
+            "Outro executor já pegou esta reserva."
+          );
+
+        }
+
+
+        if (
+          dados.status === "cancelada" ||
+          dados.status === "concluida"
+        ) {
+
+          throw new Error(
+            "Esta reserva não está mais disponível."
+          );
+
+        }
+
+
+        transacao.update(
+          referencia,
+          {
+
+            executor_id:
+              executorAtual.uid,
+
+            nome_executor:
+              nomeExecutor,
+
+            status:
+              "confirmada"
+
+          }
+        );
+
+      }
+    );
+
+
+    alert(
+      "Reserva atribuída a você!"
+    );
+
+
+  } catch (erro) {
+
+    console.error(erro);
+
+
+    alert(
+      erro.message ||
+      "Erro ao pegar a reserva."
+    );
+
+  }
+
+
+  await carregarReservas();
+
+}
+
+
+
+/* =====================================
+   CONCLUIR RESERVA
+===================================== */
+
+async function concluirReserva(
+  id,
+  botao
+) {
+
+  const confirmar =
+    confirm(
+      "Deseja marcar esta reserva como concluída?"
+    );
+
+
+  if (!confirmar) {
+
+    return;
+
+  }
+
+
+  botao.disabled = true;
+
+
+  try {
+
+    await updateDoc(
+
+      doc(
+        db,
+        "reservas",
+        id
+      ),
+
+      {
+
+        status:
+          "concluida"
+
+      }
+
+    );
+
+
+    alert(
+      "Reserva marcada como concluída!"
+    );
+
+
+  } catch (erro) {
+
+    console.error(erro);
+
+
+    alert(
+      "Erro ao atualizar a reserva."
+    );
+
+  }
+
+
+  await carregarReservas();
+
+}
+
+
+
+/* =====================================
+   FORMATAR DATA
+===================================== */
+
+function formatarData(data) {
+
+  if (!data) {
+
+    return "--/--/----";
+
+  }
+
+
+  /*
+    A data está salva como:
+
+    2026-09-20
+  */
+
+  const partes =
+    data.split("-");
+
+
+  if (partes.length !== 3) {
+
+    return data;
+
+  }
+
+
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+}
+
+
+
+/* =====================================
+   SEGURANÇA DO TEXTO
+===================================== */
+
+function escapeHTML(texto) {
+
+  const div =
+    document.createElement("div");
+
+
+  div.textContent =
+    texto;
+
+
+  return div.innerHTML;
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

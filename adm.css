@@ -1,0 +1,241 @@
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0d0c;
+    color: #f2ede4;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 0 auto 40px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #2a2a25;
+  }
+
+  .marca {
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: #f2ede4;
+  }
+  .marca span { color: #ff6b1a; }
+
+  .marca .cargo {
+    display: block;
+    font-size: 11px;
+    font-weight: normal;
+    letter-spacing: 0.5px;
+    color: #a49e93;
+    margin-top: 2px;
+  }
+
+  header a.sair {
+    color: #a49e93;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  header a.sair:hover { color: #ff6b1a; }
+
+  .conteudo {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 26px;
+    margin-bottom: 6px;
+  }
+
+  p.sub {
+    color: #a49e93;
+    font-size: 14px;
+    margin-bottom: 26px;
+  }
+
+  .contador {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+  .contador div {
+    background: #161613;
+    border: 1px solid #2a2a25;
+    border-radius: 6px;
+    padding: 14px 18px;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+  .contador .num {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff6b1a;
+  }
+  .contador .rotulo {
+    font-size: 12px;
+    color: #a49e93;
+    margin-top: 2px;
+  }
+
+  .abas {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #2a2a25;
+  }
+  .abas button {
+    background: none;
+    border: none;
+    color: #a49e93;
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .abas button.ativa {
+    color: #ff6b1a;
+    border-color: #ff6b1a;
+  }
+
+  .painel { display: none; }
+  .painel.ativo { display: block; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #161613;
+    border: 1px solid #2a2a25;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid #2a2a25;
+    font-size: 13px;
+  }
+
+  th {
+    color: #a49e93;
+    font-weight: bold;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .tipo {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+  }
+  .tipo.usuario { background: rgba(255,255,255,0.06); color: #cfcac0; }
+  .tipo.executor { background: rgba(255,107,26,0.15); color: #ff6b1a; }
+  .tipo.admin { background: rgba(214,69,69,0.15); color: #d64545; }
+
+  .status {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .status.confirmada { background: rgba(255,107,26,0.15); color: #ff6b1a; }
+  .status.pendente { background: rgba(255,255,255,0.06); color: #cfcac0; }
+  .status.concluida { background: rgba(255,255,255,0.04); color: #6d6a63; }
+
+  button.acao {
+    background: transparent;
+    border: 1px solid #f2ede4;
+    color: #f2ede4;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button.acao:hover { border-color: #ff6b1a; color: #ff6b1a; }
+
+  button.remover {
+    background: transparent;
+    border: 1px solid #d64545;
+    color: #d64545;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button.remover:hover { background: rgba(214,69,69,0.1); }
+  
+  header .botao-sair {
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  padding: 6px 12px;
+
+  border: 1px solid #2a2a25;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #a49e93;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.2;
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition: color 0.2s, border-color 0.2s;
+
+}
+
+
+header .botao-sair:hover {
+
+  background: transparent;
+  color: #ff6b1a;
+  border-color: #ff6b1a;
+
+}
+
+
+header .botao-sair:active {
+
+  background: transparent;
+  color: #e85b0d;
+  border-color: #e85b0d;
+
+}
+
+
+header .botao-sair:focus-visible {
+
+  outline: 1px solid #ff6b1a;
+  outline-offset: 2px;
+
+}
+
+
+header .botao-sair:disabled {
+
+  opacity: 0.5;
+  cursor: not-allowed;
+
+}
+
+  

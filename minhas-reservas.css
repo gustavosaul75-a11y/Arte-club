@@ -1,0 +1,69 @@
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0d0c;
+    color: #f2ede4;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    padding: 0 24px 40px;
+  }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 800px; margin: 0 auto; padding: 20px 0;
+    border-bottom: 1px solid #2a2a25; flex-wrap: wrap; gap: 10px;
+  }
+  .marca { font-size: 22px; font-weight: bold; letter-spacing: 1px; text-decoration: none; color: #f2ede4; }
+  .marca span { color: #ff6b1a; }
+
+  .usuario-area { display: flex; align-items: center; gap: 12px; }
+  .usuario-nome { font-size: 14px; color: #cfcac0; }
+  .badge { font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+  .badge-usuario { background: rgba(255,107,26,0.15); color: #ff6b1a; }
+  .btn-sair {
+    color: #a49e93; text-decoration: none; font-size: 13px;
+    border: 1px solid #2a2a25; padding: 6px 12px; border-radius: 4px;
+  }
+  
+  .btn-sair:hover { border-color: #ff6b1a; color: #ff6b1a; }
+
+  .tabs-nav {
+    display: flex; gap: 6px; max-width: 800px; margin: 0 auto 32px;
+    padding-top: 14px; overflow-x: auto; justify-content:center;
+  }
+  .tabs-nav .tab {
+    color: #a49e93; text-decoration: none; font-size: 14px;
+    padding: 10px 16px; border-radius: 6px; white-space: nowrap;
+  }
+  .tabs-nav .tab.ativa { background: #ff6b1a; color: #0d0d0c; font-weight: bold; }
+  .tabs-nav .tab:hover:not(.ativa) { color: #f2ede4; }
+
+  .conteudo { max-width: 700px; margin: 0 auto; }
+
+  h1 { font-size: 26px; margin-bottom: 6px; }
+  p.sub { color: #a49e93; font-size: 14px; margin-bottom: 28px; }
+
+  .reserva {
+    background: #161613; border: 1px solid #2a2a25; border-radius: 6px;
+    padding: 18px 20px; margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .reserva .info h3 { font-size: 18px; margin-bottom: 4px; }
+  .reserva .info span { font-size: 13px; color: #a49e93; }
+
+  .direita { display: flex; align-items: center; gap: 14px; }
+
+  .status { font-size: 12px; font-weight: bold; padding: 5px 12px; border-radius: 20px; }
+  .status.confirmada { background: rgba(255, 107, 26, 0.15); color: #ff6b1a; }
+  .status.pendente { background: rgba(255, 255, 255, 0.08); color: #cfcac0; }
+  .status.concluida { background: rgba(255, 255, 255, 0.05); color: #6d6a63; }
+  .status.cancelada { background: rgba(214, 69, 69, 0.15); color: #d64545; }
+
+  button.cancelar {
+    background: transparent; border: 1px solid #f2ede4; color: #f2ede4;
+    padding: 8px 14px; font-size: 13px; border-radius: 4px; cursor: pointer;
+  }
+  button.cancelar:hover { border-color: #ff6b1a; color: #ff6b1a; }
+
+  .vazio { text-align: center; color: #a49e93; font-size: 14px; padding: 40px 0; }
