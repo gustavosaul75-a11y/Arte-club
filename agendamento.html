@@ -6,6 +6,7 @@
   <title>Agendamentos - Arte Club</title>
   <link rel="stylesheet" href="agenda.css">
   <link rel="stylesheet" href="sair.css">
+  <link rel="stylesheet" href="pagamento.css">
 
   <style>
     /* ===== BOTÃO SAIR (padrão do site) ===== */
@@ -251,6 +252,79 @@
       font-size: 15px;
     }
 
+    /* ===== PAGAMENTO ===== */
+
+    .pagamento-box {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .pagamento-titulo {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #f2ede4;
+    }
+
+    .opcao-pagamento {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 13px 14px;
+      border: 1px solid #2a2a25;
+      border-radius: 10px;
+      background: #0d0d0c;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .opcao-pagamento:hover {
+      border-color: #a49e93;
+    }
+
+    .opcao-pagamento.escolhida {
+      border-color: #ff6b1a;
+    }
+
+    .opcao-pagamento input {
+      flex: 0 0 auto;
+      width: auto;
+      margin: 3px 0 0;
+      padding: 0;
+      accent-color: #ff6b1a;
+    }
+
+    .opcao-texto {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .opcao-texto b {
+      font-size: 15px;
+      color: #f2ede4;
+    }
+
+    .opcao-texto small {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #a49e93;
+    }
+
+    .total-pagamento {
+      margin-top: 4px;
+      font-size: 15px;
+      color: #f2ede4;
+    }
+
+    .total-pagamento small {
+      display: block;
+      margin-top: 2px;
+      font-size: 13px;
+      color: #a49e93;
+    }
+
     /* ===== BOTÃO ===== */
 
     .btn-confirmar {
@@ -313,8 +387,6 @@
       .dia {
         min-height: 38px;
       }
-      
-      
     }
   </style>
 </head>
@@ -455,6 +527,43 @@
 
     </div>
 
+    <!-- FORMA DE PAGAMENTO -->
+    <div class="pagamento-box" id="pagamentoBox">
+
+      <span class="pagamento-titulo">
+        Forma de pagamento
+      </span>
+
+      <label class="opcao-pagamento">
+
+        <input type="radio" name="pagamento" value="dinheiro">
+
+        <span class="opcao-texto">
+          <b>Dinheiro</b>
+          <small>
+            Combine a entrega da entrada e pague o restante no dia do passeio.
+          </small>
+        </span>
+
+      </label>
+
+      <label class="opcao-pagamento">
+
+        <input type="radio" name="pagamento" value="pix">
+
+        <span class="opcao-texto">
+          <b>PIX</b>
+          <small>
+            Pague a entrada agora pelo QR Code ou pelo código copia e cola.
+          </small>
+        </span>
+
+      </label>
+
+      <div class="total-pagamento" id="totalPagamento"></div>
+
+    </div>
+
     <!-- BOTÃO -->
     <button
       type="button"
@@ -467,6 +576,9 @@
   </div>
 
 </div>
+
+<script src="qrcode.js"></script>
+<script src="pagamento.js"></script>
 
 <script type="module">
 
@@ -487,6 +599,22 @@
     getDocs,
     serverTimestamp
   } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+  /* =========================
+     AVISO SE FALTAREM ARQUIVOS
+  ========================= */
+
+  if (typeof Pagamento === "undefined") {
+
+    alert(
+      "Faltam arquivos do site (pagamento.js e qrcode.js). " +
+      "Envie todos os arquivos para o GitHub e atualize a página."
+    );
+
+    throw new Error("pagamento.js não foi carregado.");
+
+  }
 
 
   /* =========================
@@ -564,6 +692,12 @@
 
   const btnConfirmar =
     document.getElementById("btnConfirmar");
+
+  const pagamentoBox =
+    document.getElementById("pagamentoBox");
+
+  const totalPagamento =
+    document.getElementById("totalPagamento");
 
 
   /* =========================
@@ -1168,6 +1302,9 @@
       pessoasBox.style.display =
         "none";
 
+      pagamentoBox.style.display =
+        "none";
+
       btnConfirmar.style.display =
         "none";
 
@@ -1182,6 +1319,9 @@
     pessoasBox.style.display =
       "block";
 
+    pagamentoBox.style.display =
+      "block";
+
     btnConfirmar.style.display =
       "block";
 
@@ -1194,6 +1334,49 @@
         .join(", ");
 
 
+    /*
+      Total e entrada (só aparecem
+      se o valor da diária estiver
+      preenchido no pagamento.js).
+    */
+
+    const valorDia =
+      Pagamento.config.VALOR_DIARIA;
+
+    const percentual =
+      Pagamento.config.PERCENTUAL_ENTRADA;
+
+
+    if (valorDia > 0) {
+
+      const total =
+        Math.round(
+          valorDia * dias.length * 100
+        ) / 100;
+
+
+      totalPagamento.innerHTML =
+
+        `Total: <b>${Pagamento.formatarReais(total)}</b>` +
+
+        `<small>${dias.length} ` +
+        `${dias.length === 1 ? "dia" : "dias"} × ` +
+        `${Pagamento.formatarReais(valorDia)}</small>` +
+
+        `<small>Entrada para confirmar (${percentual}%): ` +
+        `${Pagamento.formatarReais(Pagamento.valorEntrada(total))}` +
+        `</small>`;
+
+    } else {
+
+      totalPagamento.innerHTML =
+
+        `<small>Para confirmar, é preciso pagar ` +
+        `${percentual}% do valor.</small>`;
+
+    }
+
+
     if (!salvando) {
 
       btnConfirmar.textContent =
@@ -1204,6 +1387,50 @@
     }
 
   }
+
+
+  /*
+    Forma de pagamento marcada
+    (dinheiro ou pix).
+  */
+
+  function formaPagamentoEscolhida() {
+
+    const marcada =
+      document.querySelector(
+        'input[name="pagamento"]:checked'
+      );
+
+    return marcada
+      ? marcada.value
+      : "";
+
+  }
+
+
+  document
+    .querySelectorAll('input[name="pagamento"]')
+    .forEach((radio) => {
+
+      radio.addEventListener(
+        "change",
+        () => {
+
+          document
+            .querySelectorAll(".opcao-pagamento")
+            .forEach((opcao) => {
+
+              opcao.classList.toggle(
+                "escolhida",
+                opcao.querySelector("input").checked
+              );
+
+            });
+
+        }
+      );
+
+    });
 
 
   /* =========================
@@ -1359,6 +1586,56 @@
       }
 
 
+      const forma =
+        formaPagamentoEscolhida();
+
+
+      if (!forma) {
+
+        alert(
+          "Escolha a forma de pagamento."
+        );
+
+        return;
+
+      }
+
+
+      const valorDia =
+        Pagamento.config.VALOR_DIARIA;
+
+
+      const totalPrevisto =
+        Math.round(
+          valorDia * diasSelecionados.size * 100
+        ) / 100;
+
+
+      /*
+        Popup: avisa que a reserva só
+        será agendada depois do
+        pagamento da entrada (50%).
+      */
+
+      const continuar =
+        await Pagamento.avisoEntrada({
+
+          entrada:
+            Pagamento.valorEntrada(totalPrevisto),
+
+          dias:
+            diasSelecionados.size
+
+        });
+
+
+      if (!continuar) {
+
+        return;
+
+      }
+
+
       salvando = true;
 
       btnConfirmar.disabled = true;
@@ -1453,6 +1730,18 @@
               status:
                 "pendente",
 
+              forma_pagamento:
+                forma,
+
+              valor:
+                valorDia,
+
+              valor_entrada:
+                Pagamento.valorEntrada(valorDia),
+
+              pagamento_status:
+                "pendente",
+
               executor_id:
                 null,
 
@@ -1472,15 +1761,48 @@
         salvou = true;
 
 
-        alert(
-          dias.length === 1
-            ? "Reserva realizada com sucesso!"
-            : `Reserva realizada com sucesso! (${dias.length} dias)`
-        );
+        const entradaFinal =
+          Pagamento.valorEntrada(
+            Math.round(
+              valorDia * dias.length * 100
+            ) / 100
+          );
 
 
-        window.location.href =
-          "minhas-reservas.html";
+        Pagamento.mostrarPagamento({
+
+          formas:
+            [forma],
+
+          entrada:
+            entradaFinal,
+
+          titulo:
+            dias.length === 1
+              ? "Reserva registrada"
+              : `Reservas registradas (${dias.length} dias)`,
+
+          mensagem:
+            `Sua reserva está <b>pendente</b>. ` +
+            `Pague ${Pagamento.config.PERCENTUAL_ENTRADA}% ` +
+            `do valor para ela ser <b>agendada</b> e ` +
+            `passar para <b>Confirmada</b>.`,
+
+          rotuloFinal:
+            "Ir para minhas reservas",
+
+          aoFinalizar:
+            () => {
+
+              window.location.href =
+                "minhas-reservas.html";
+
+            },
+
+          permitirFechar:
+            false
+
+        });
 
 
       } catch (erro) {
