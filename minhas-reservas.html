@@ -8,6 +8,235 @@
   <title>Minhas reservas — Arte Club</title>
 
   <link rel="stylesheet" href="minhas-reservas.css">
+  <link rel="stylesheet" href="sair.css">
+  <link rel="stylesheet" href="pagamento.css">
+
+  <style>
+    /* =====================================
+       BOTÃO SAIR (padrão do site)
+    ===================================== */
+
+    header.topbar .usuario-area .botao-sair {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: auto;
+      padding: 6px 12px;
+      border: 1px solid #2a2a25;
+      border-radius: 6px;
+      background: transparent;
+      color: #a49e93;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: normal;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    header.topbar .usuario-area .botao-sair:hover,
+    header.topbar .usuario-area .botao-sair:focus-visible {
+      background: transparent;
+      color: #ff6b1a;
+      border-color: #ff6b1a;
+    }
+
+    header.topbar .usuario-area .botao-sair:active {
+      background: transparent;
+      color: #e85b0d;
+      border-color: #e85b0d;
+    }
+
+
+    /* =====================================
+       CARTÃO DA RESERVA
+       (a primeira linha continua igual à
+       sua: info à esquerda, status e
+       cancelar à direita. Abaixo dela
+       entram os dados de pagamento.)
+    ===================================== */
+
+    .reserva {
+      display: block;
+    }
+
+    .rp-topo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .rp-detalhes {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #2a2a25;
+    }
+
+    .rp-linhas {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .rp-linha {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: #a49e93;
+    }
+
+    .rp-linha b {
+      font-weight: 600;
+      text-align: right;
+      color: #f2ede4;
+    }
+
+    .rp-alerta {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid #ff6b1a;
+      border-radius: 8px;
+      background: rgba(255, 107, 26, 0.08);
+      font-size: 13px;
+      line-height: 1.45;
+      color: #f2ede4;
+    }
+
+    .rp-acoes {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+
+    /* =====================================
+       BOTÕES DE PAGAMENTO
+    ===================================== */
+
+    .rp-btn {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid #2a2a25;
+      border-radius: 6px;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 1.2;
+      color: #a49e93;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .rp-btn:hover {
+      background: transparent;
+      color: #ff6b1a;
+      border-color: #ff6b1a;
+    }
+
+    .rp-btn.principal {
+      border-color: #ff6b1a;
+      background: #ff6b1a;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .rp-btn.principal:hover {
+      border-color: #e85b0d;
+      background: #e85b0d;
+      color: #fff;
+    }
+
+
+    /* =====================================
+       AVISO NO TOPO (reservas aguardando 50%)
+    ===================================== */
+
+    .rp-aviso-topo {
+      display: none;
+      margin: 16px 0 0;
+      padding: 14px 16px;
+      border: 1px solid #ff6b1a;
+      border-radius: 10px;
+      background: rgba(255, 107, 26, 0.08);
+      font-size: 14px;
+      line-height: 1.5;
+      color: #f2ede4;
+    }
+
+    .rp-aviso-topo b {
+      color: #ff6b1a;
+    }
+
+    .rp-aviso-topo .rp-btn {
+      margin-top: 10px;
+    }
+
+
+    /* =====================================
+       FORMAS DE PAGAMENTO
+    ===================================== */
+
+    .rp-formas {
+      margin: 16px 0 20px;
+      padding: 16px;
+      border: 1px solid #2a2a25;
+      border-radius: 10px;
+      background: #161613;
+    }
+
+    .rp-formas h2 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #f2ede4;
+    }
+
+    .rp-formas-lista {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .rp-forma {
+      padding: 4px 12px;
+      border: 1px solid #2a2a25;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #cfcac0;
+    }
+
+    .rp-formas p {
+      margin: 0 0 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #a49e93;
+    }
+
+    .rp-formas p b {
+      color: #f2ede4;
+    }
+
+    .rp-formas p a {
+      font-weight: bold;
+      color: #f2ede4;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .rp-formas p a:hover {
+      color: #ff6b1a;
+    }
+
+    .rp-acoes-formas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+  </style>
 </head>
 
 <body>
@@ -28,9 +257,9 @@
       Usuário
     </span>
 
-    <a href="#" class="btn-sair" id="btnSair">
+    <button type="button" class="botao-sair" id="btnSair">
       Sair
-    </a>
+    </button>
 
   </div>
 
@@ -62,9 +291,55 @@
     Acompanhe o status dos seus passeios no flutuante.
   </p>
 
+
+  <!-- AVISO: RESERVAS AGUARDANDO OS 50% -->
+  <div class="rp-aviso-topo" id="avisoPendente"></div>
+
+
+  <!-- FORMAS DE PAGAMENTO -->
+  <div class="rp-formas">
+
+    <h2>Formas de pagamento</h2>
+
+    <div class="rp-formas-lista">
+      <span class="rp-forma">PIX</span>
+      <span class="rp-forma">Dinheiro</span>
+    </div>
+
+    <p>
+      Para agendar, é preciso pagar
+      <b id="txtPercentual">50%</b> do valor.
+      Quando o pagamento for confirmado, sua reserva passa de
+      <b>Pendente</b> para <b>Confirmada</b>.
+    </p>
+
+    <p>
+      Mais informações pelo número
+      <a id="linkTelefone" href="#"></a>
+    </p>
+
+    <div class="rp-acoes-formas">
+
+      <button type="button" class="rp-btn principal" id="btnFormas">
+        Ver como pagar
+      </button>
+
+      <a class="rp-btn" id="linkWhats" target="_blank" rel="noopener" href="#">
+        Falar no WhatsApp
+      </a>
+
+    </div>
+
+  </div>
+
+
   <div id="lista"></div>
 
 </div>
+
+
+<script src="qrcode.js"></script>
+<script src="pagamento.js"></script>
 
 
 <!-- FIREBASE -->
@@ -127,6 +402,43 @@
 
   const btnSair =
     document.getElementById("btnSair");
+
+  const avisoPendente =
+    document.getElementById("avisoPendente");
+
+  const btnFormas =
+    document.getElementById("btnFormas");
+
+  const linkTelefone =
+    document.getElementById("linkTelefone");
+
+  const linkWhats =
+    document.getElementById("linkWhats");
+
+  const txtPercentual =
+    document.getElementById("txtPercentual");
+
+
+  // RESERVAS CARREGADAS
+
+  let reservasAtuais = [];
+
+
+  // DADOS DE CONTATO
+
+  linkTelefone.textContent =
+    Pagamento.telefoneFormatado();
+
+  linkTelefone.href =
+    Pagamento.linkTelefone();
+
+  linkWhats.href =
+    Pagamento.linkWhatsApp(
+      "Olá! Gostaria de informações sobre a minha reserva no flutuante."
+    );
+
+  txtPercentual.textContent =
+    `${Pagamento.config.PERCENTUAL_ENTRADA}%`;
 
 
   // STATUS
@@ -204,6 +516,10 @@
 
       if (resultado.empty) {
 
+        reservasAtuais = [];
+
+        atualizarAviso();
+
         lista.innerHTML =
           '<div class="vazio">Você ainda não tem reservas.</div>';
 
@@ -245,115 +561,18 @@
       });
 
 
+      reservasAtuais = reservas;
+
+      atualizarAviso();
+
+
       // Mostrar reservas
 
       reservas.forEach((r) => {
 
-        const div =
-          document.createElement("div");
-
-
-        div.className = "reserva";
-
-
-        // Converter data
-
-        let dataFormatada =
-          r.data_reserva;
-
-
-        if (r.data_reserva) {
-
-          const partes =
-            r.data_reserva.split("-");
-
-
-          if (partes.length === 3) {
-
-            dataFormatada =
-              `${partes[2]}/${partes[1]}/${partes[0]}`;
-
-          }
-
-        }
-
-
-        // Nome do status
-
-        const status =
-          r.status || "pendente";
-
-
-        const nomeStatus =
-          nomesStatus[status] || status;
-
-
-        // Botão cancelar
-
-        let botaoCancelar = "";
-
-
-        if (
-          status === "pendente" ||
-          status === "confirmada"
-        ) {
-
-          botaoCancelar = `
-            <button
-              class="cancelar"
-              data-id="${r.id}">
-              Cancelar
-            </button>
-          `;
-
-        }
-
-
-        div.innerHTML = `
-
-          <div class="info">
-
-            <h3>
-              ${dataFormatada} às ${r.horario}
-            </h3>
-
-            <span>
-              ${r.quantidade_pessoas} pessoas
-            </span>
-
-          </div>
-
-
-          <div class="direita">
-
-            <span class="status ${status}">
-              ${nomeStatus}
-            </span>
-
-            ${botaoCancelar}
-
-          </div>
-
-        `;
-
-
-        lista.appendChild(div);
-
-
-        // Evento do botão cancelar
-
-        const botao =
-          div.querySelector(".cancelar");
-
-
-        if (botao) {
-
-          botao.addEventListener(
-            "click",
-            () => cancelarReserva(r.id)
-          );
-
-        }
+        lista.appendChild(
+          criarCartao(r)
+        );
 
       });
 
@@ -377,14 +596,489 @@
   }
 
 
+  // CARTÃO DA RESERVA
+
+  function criarCartao(r) {
+
+    const div =
+      document.createElement("div");
+
+
+    div.className = "reserva";
+
+
+    // Converter data
+
+    let dataFormatada =
+      r.data_reserva;
+
+
+    if (r.data_reserva) {
+
+      const partes =
+        r.data_reserva.split("-");
+
+
+      if (partes.length === 3) {
+
+        dataFormatada =
+          `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+      }
+
+    }
+
+
+    // Nome do status
+
+    const status =
+      r.status || "pendente";
+
+
+    const nomeStatus =
+      nomesStatus[status] || status;
+
+
+    // Botão cancelar
+
+    let botaoCancelar = "";
+
+
+    if (
+      status === "pendente" ||
+      status === "confirmada"
+    ) {
+
+      botaoCancelar = `
+        <button
+          class="cancelar"
+          data-id="${escapeHTML(r.id)}">
+          Cancelar
+        </button>
+      `;
+
+    }
+
+
+    // Dados de pagamento
+
+    const detalhes =
+      montarPagamento(r);
+
+
+    div.innerHTML = `
+
+      <div class="rp-topo">
+
+        <div class="info">
+
+          <h3>
+            ${escapeHTML(dataFormatada || "--/--/----")}
+            às
+            ${escapeHTML(r.horario || "--:--")}
+          </h3>
+
+          <span>
+            ${Number(r.quantidade_pessoas) || 0} pessoas
+          </span>
+
+        </div>
+
+
+        <div class="direita">
+
+          <span class="status ${escapeHTML(status)}">
+            ${escapeHTML(nomeStatus)}
+          </span>
+
+          ${botaoCancelar}
+
+        </div>
+
+      </div>
+
+      ${detalhes}
+
+    `;
+
+
+    // Evento do botão cancelar
+
+    const botao =
+      div.querySelector(".cancelar");
+
+
+    if (botao) {
+
+      botao.addEventListener(
+        "click",
+        () => cancelarReserva(r, botao)
+      );
+
+    }
+
+
+    // Evento do botão "Como pagar"
+
+    const botaoPagar =
+      div.querySelector(".rp-pagar");
+
+
+    if (botaoPagar) {
+
+      botaoPagar.addEventListener(
+        "click",
+        () => abrirPagamentoDaReserva(r)
+      );
+
+    }
+
+
+    return div;
+
+  }
+
+
+  // BLOCO DE PAGAMENTO DO CARTÃO
+  // (só aparece em reservas feitas
+  // com forma de pagamento)
+
+  function montarPagamento(r) {
+
+    if (!r.forma_pagamento) {
+
+      return "";
+
+    }
+
+
+    const percentual =
+      Pagamento.config.PERCENTUAL_ENTRADA;
+
+
+    const formaTexto =
+      r.forma_pagamento === "pix"
+        ? "PIX"
+        : "Dinheiro";
+
+
+    const situacao =
+      r.pagamento_status ||
+      "pendente";
+
+
+    const situacaoTextos = {
+
+      pendente: `Aguardando ${percentual}%`,
+
+      entrada_paga: `${percentual}% pago`,
+
+      pago: "Pago"
+
+    };
+
+
+    let situacaoTexto =
+      situacaoTextos[situacao] ||
+      situacaoTextos.pendente;
+
+
+    if (
+      r.status === "cancelada" &&
+      situacao === "pendente"
+    ) {
+
+      situacaoTexto = "Não pago";
+
+    }
+
+
+    const valor =
+      Number(r.valor) || 0;
+
+    const entrada =
+      Number(r.valor_entrada) || 0;
+
+    const restante =
+      Math.max(valor - entrada, 0);
+
+
+    let linhas =
+
+      `<div class="rp-linha"><span>Forma de pagamento</span>` +
+      `<b>${formaTexto}</b></div>`;
+
+
+    if (valor > 0) {
+
+      linhas +=
+
+        `<div class="rp-linha"><span>Valor do dia</span>` +
+        `<b>${Pagamento.formatarReais(valor)}</b></div>` +
+
+        `<div class="rp-linha"><span>Entrada (${percentual}%)</span>` +
+        `<b>${Pagamento.formatarReais(entrada)}</b></div>`;
+
+
+      if (situacao === "entrada_paga") {
+
+        linhas +=
+
+          `<div class="rp-linha"><span>Restante no dia</span>` +
+          `<b>${Pagamento.formatarReais(restante)}</b></div>`;
+
+      }
+
+    }
+
+
+    linhas +=
+
+      `<div class="rp-linha"><span>Situação</span>` +
+      `<b>${situacaoTexto}</b></div>`;
+
+
+    let aviso = "";
+
+
+    if (
+      situacao === "pendente" &&
+      r.status !== "cancelada"
+    ) {
+
+      aviso =
+
+        `<div class="rp-alerta">` +
+        `Esta reserva ainda <b>não foi agendada</b>. ` +
+        `Pague ${percentual}% do valor para ela passar de ` +
+        `<b>Pendente</b> para <b>Confirmada</b>.` +
+        `</div>` +
+
+        `<div class="rp-acoes">` +
+        `<button type="button" class="rp-btn principal rp-pagar">` +
+        `Como pagar</button>` +
+        `</div>`;
+
+    }
+
+
+    return `
+
+      <div class="rp-detalhes">
+
+        <div class="rp-linhas">
+          ${linhas}
+        </div>
+
+        ${aviso}
+
+      </div>
+
+    `;
+
+  }
+
+
+  // RESERVAS AGUARDANDO OS 50%
+
+  function aguardandoPagamento() {
+
+    return reservasAtuais.filter((r) => {
+
+      return (
+        r.pagamento_status === "pendente" &&
+        r.status !== "cancelada"
+      );
+
+    });
+
+  }
+
+
+  function somaEntrada(itens) {
+
+    const total =
+      itens.reduce((soma, r) => {
+
+        return soma +
+          (Number(r.valor_entrada) || 0);
+
+      }, 0);
+
+
+    return Math.round(total * 100) / 100;
+
+  }
+
+
+  // AVISO NO TOPO
+
+  function atualizarAviso() {
+
+    const pendentes =
+      aguardandoPagamento();
+
+
+    if (pendentes.length === 0) {
+
+      avisoPendente.style.display =
+        "none";
+
+      avisoPendente.innerHTML = "";
+
+      return;
+
+    }
+
+
+    const total =
+      somaEntrada(pendentes);
+
+    const percentual =
+      Pagamento.config.PERCENTUAL_ENTRADA;
+
+
+    avisoPendente.style.display =
+      "block";
+
+
+    avisoPendente.innerHTML =
+
+      `Você tem <b>${pendentes.length}</b> ` +
+      `${pendentes.length === 1 ? "reserva" : "reservas"} ` +
+      `aguardando o pagamento de <b>${percentual}%</b>` +
+
+      (
+        total > 0
+          ? ` (total da entrada: <b>${Pagamento.formatarReais(total)}</b>)`
+          : ""
+      ) +
+
+      `. Elas só serão agendadas depois do pagamento.` +
+
+      `<br>` +
+
+      `<button type="button" class="rp-btn principal">` +
+      `Como pagar</button>`;
+
+
+    avisoPendente
+      .querySelector("button")
+      .addEventListener(
+        "click",
+        abrirPagamentoGeral
+      );
+
+  }
+
+
+  // POPUP: FORMAS DE PAGAMENTO
+
+  function abrirPagamentoGeral() {
+
+    const pendentes =
+      aguardandoPagamento();
+
+    const percentual =
+      Pagamento.config.PERCENTUAL_ENTRADA;
+
+
+    const mensagem =
+      pendentes.length > 0
+        ? `Você tem ${pendentes.length} ` +
+          `${pendentes.length === 1 ? "reserva" : "reservas"} ` +
+          `aguardando o pagamento de ${percentual}%. ` +
+          `Elas só serão agendadas depois do pagamento.`
+        : `Para agendar, é preciso pagar ${percentual}% do valor. ` +
+          `Quando o pagamento for confirmado, a reserva passa de ` +
+          `<b>Pendente</b> para <b>Confirmada</b>.`;
+
+
+    Pagamento.mostrarPagamento({
+
+      formas:
+        ["pix", "dinheiro"],
+
+      entrada:
+        somaEntrada(pendentes),
+
+      titulo:
+        "Formas de pagamento",
+
+      mensagem:
+        mensagem,
+
+      rotuloFinal:
+        "Fechar",
+
+      permitirFechar:
+        true
+
+    });
+
+  }
+
+
+  btnFormas.addEventListener(
+    "click",
+    abrirPagamentoGeral
+  );
+
+
+  // POPUP: PAGAR UMA RESERVA
+
+  function abrirPagamentoDaReserva(r) {
+
+    const percentual =
+      Pagamento.config.PERCENTUAL_ENTRADA;
+
+
+    Pagamento.mostrarPagamento({
+
+      formas:
+        [r.forma_pagamento || "pix"],
+
+      entrada:
+        Number(r.valor_entrada) || 0,
+
+      titulo:
+        "Pagamento da reserva",
+
+      mensagem:
+        `Pague ${percentual}% do valor para esta reserva ser ` +
+        `<b>agendada</b> e passar para <b>Confirmada</b>.`,
+
+      rotuloFinal:
+        "Fechar",
+
+      permitirFechar:
+        true
+
+    });
+
+  }
+
+
   // CANCELAR RESERVA
 
-  async function cancelarReserva(id) {
+  async function cancelarReserva(r, botao) {
+
+    const jaPagou =
+      r.pagamento_status === "entrada_paga" ||
+      r.pagamento_status === "pago";
+
+
+    const pergunta =
+      jaPagou
+        ? "Você já pagou a entrada desta reserva. Para tratar do valor " +
+          "pago, fale com a administração pelo número " +
+          Pagamento.telefoneFormatado() +
+          ".\n\nDeseja cancelar mesmo assim?"
+        : "Tem certeza que deseja cancelar esta reserva?";
+
 
     const confirmar =
-      confirm(
-        "Tem certeza que deseja cancelar esta reserva?"
-      );
+      confirm(pergunta);
 
 
     if (!confirmar) {
@@ -394,10 +1088,13 @@
     }
 
 
+    botao.disabled = true;
+
+
     try {
 
       const reservaRef =
-        doc(db, "reservas", id);
+        doc(db, "reservas", r.id);
 
 
       await updateDoc(
@@ -434,6 +1131,9 @@
       );
 
 
+      botao.disabled = false;
+
+
       alert(
         "Não foi possível cancelar a reserva."
       );
@@ -447,17 +1147,15 @@
 
   btnSair.addEventListener(
     "click",
-    async (event) => {
-
-      event.preventDefault();
-
+    async () => {
 
       try {
 
         await signOut(auth);
 
-        window.location.href =
-          "index.html";
+        window.location.replace(
+          "index.html"
+        );
 
       } catch (erro) {
 
@@ -471,6 +1169,21 @@
 
     }
   );
+
+
+  // SEGURANÇA DO TEXTO
+
+  function escapeHTML(texto) {
+
+    const div =
+      document.createElement("div");
+
+    div.textContent =
+      texto;
+
+    return div.innerHTML;
+
+  }
 
 </script>
 
