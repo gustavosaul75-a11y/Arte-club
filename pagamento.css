@@ -1,0 +1,183 @@
+/* =====================================
+   POPUPS DE PAGAMENTO — Arte Club
+
+   Cores do tema:
+   fundo    #161613
+   borda    #2a2a25
+   creme    #f2ede4
+   cinza    #a49e93
+   laranja  #ff6b1a
+===================================== */
+
+.pg-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(13, 13, 12, 0.94);
+  overflow-y: auto;
+}
+
+.pg-caixa {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  padding: 22px;
+  border: 1px solid #2a2a25;
+  border-radius: 14px;
+  background: #161613;
+  color: #f2ede4;
+  box-sizing: border-box;
+}
+
+.pg-titulo {
+  margin: 0 0 12px;
+  font-size: 20px;
+  color: #f2ede4;
+}
+
+.pg-texto {
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #cfcac0;
+}
+
+.pg-texto b {
+  color: #f2ede4;
+}
+
+.pg-nota {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #a49e93;
+}
+
+.pg-destaque {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid #ff6b1a;
+  border-radius: 10px;
+  background: rgba(255, 107, 26, 0.08);
+  font-size: 15px;
+  line-height: 1.5;
+  color: #f2ede4;
+}
+
+.pg-destaque b {
+  color: #ff6b1a;
+}
+
+.pg-secao {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a25;
+}
+
+.pg-secao h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #f2ede4;
+}
+
+.pg-qr {
+  display: block;
+  width: max-content;
+  margin: 0 auto 4px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+  line-height: 0;
+}
+
+.pg-qr svg {
+  display: block;
+  width: 200px;
+  height: 200px;
+}
+
+.pg-rotulo {
+  display: block;
+  margin: 12px 0 6px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #f2ede4;
+}
+
+.pg-codigo {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #2a2a25;
+  border-radius: 8px;
+  background: #0d0d0c;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #cfcac0;
+  resize: none;
+}
+
+.pg-contato {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid #2a2a25;
+  border-radius: 10px;
+  background: #0d0d0c;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #cfcac0;
+}
+
+.pg-contato a {
+  font-size: 16px;
+  font-weight: bold;
+  color: #f2ede4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.pg-contato a:hover {
+  color: #ff6b1a;
+}
+
+.pg-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 10px;
+  padding: 13px;
+  border: 1px solid #ff6b1a;
+  border-radius: 10px;
+  background: #ff6b1a;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1.2;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pg-btn:hover {
+  background: #e85b0d;
+  border-color: #e85b0d;
+}
+
+.pg-btn.secundario {
+  border-color: #2a2a25;
+  background: transparent;
+  font-weight: normal;
+  color: #a49e93;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.pg-btn.secundario:hover {
+  background: transparent;
+  border-color: #ff6b1a;
+  color: #ff6b1a;
+}
